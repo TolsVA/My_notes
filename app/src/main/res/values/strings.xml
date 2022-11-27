@@ -1,3 +1,14 @@
 <resources>
-    <string name="app_name">My_notes</string>
+    <string name="app_name">My_Notes</string>
+    <string name="title">title</string>
+    <string name="text">text</string>
+    <string name="data">data</string>
+    <string name="search_for_notes">Search for notes</string>
+    <string name="add_note">add note</string>
+    <string name="remove_note">remove note</string>
+    <string name="note_folders">note folders</string>
+    <string name="clear_history">clear history</string>
+    <string name="search">search</string>
+    <string name="save">save</string>
+    <string name="delete">delete</string>
 </resources>
