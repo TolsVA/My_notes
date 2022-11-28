@@ -7,7 +7,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -108,8 +107,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             view.setClickable(false);
             view.setVisibility(View.GONE);
             newNote = new Note(-1, "", "", String.valueOf (new Date ()));
-//            indexPrev = index;
-//            index = 0;
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 pager.setAdapter(changeContent( Collections.singletonList(newNote)));
             } else {
