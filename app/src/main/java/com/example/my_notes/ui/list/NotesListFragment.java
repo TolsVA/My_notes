@@ -88,7 +88,7 @@ public class NotesListFragment extends Fragment {
 
         scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
 
-        if (notes.size () != 0) {
+        if (notes.size () != 0 && index >= 0) {
             notesContainer.getChildAt ( index ).setBackground ( getResources ( ).getDrawable ( R.drawable.layout_bg_2, requireContext ( ).getTheme ( ) ) );
         }
     }
