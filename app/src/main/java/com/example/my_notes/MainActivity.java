@@ -7,7 +7,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultListener;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -108,8 +107,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             view.setClickable(false);
             view.setVisibility(View.GONE);
             newNote = new Note(-1, "", "", String.valueOf (new Date ()));
-            indexPrev = index;
-            index = 0;
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 pager.setAdapter(changeContent( Collections.singletonList(newNote)));
             } else {
@@ -147,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
                     if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
                         fab.setVisibility(View.VISIBLE);
+                        fab.setClickable(true);
                         pager.setCurrentItem ( index, false );
                     } else {
                         fab.setVisibility(View.GONE);
@@ -182,6 +180,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
                     note = result.getParcelable ( NoteDetailFragment.ARG_NEW_NOTE );
                     fab.setVisibility ( View.VISIBLE );
+                    fab.setClickable(true);
 
                     if (note.getIndex ( ) != -1) {
                         presenter.upgradeNote ( note );
@@ -189,12 +188,15 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     } else {
                         presenter.addNote ( note );
                         notes = presenter.refresh ();
-                        index = notes.size ( ) - 1;
+                        indexPrev = index;
+                        index = 0;
                         note = notes.get ( index );
                     }
 
                     if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        showDetails ( );
+                        if (notes.size () > 1) {
+                            showDetails ( );
+                        }
                     } else {
                         Fragment f = getSupportFragmentManager ( )
                                 .findFragmentByTag ( NoteDetailFragment.TAG );
@@ -211,12 +213,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                         }
                     }
 
-                    FragmentManager fm1 = getSupportFragmentManager ( );
-                    fm1.popBackStack ( );
-
-                    fm1.beginTransaction ( )
+                    fm.beginTransaction ( )
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
+
                 } );
 
         getSupportFragmentManager ( )
@@ -224,18 +224,15 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
                     fab.setVisibility ( View.GONE );
 
-                    FragmentManager fm12 = getSupportFragmentManager ( );
-
-                    fm12.beginTransaction ( )
+                    fm.beginTransaction ( )
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
                 } );
         getSupportFragmentManager ( )
                 .setFragmentResultListener ( NotesListFragment.ADD_DELETE_KEY, this, (requestKey, result) -> {
                     deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
-                    FragmentManager fm13 = getSupportFragmentManager ( );
 
-                    fm13.beginTransaction ( )
+                    fm.beginTransaction ( )
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
                 } );
@@ -248,9 +245,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         NestedScrollView scrollView = findViewById ( R.id.scroll_list );
         LinearLayoutCompat notesContainer = findViewById ( R.id.container_notes );
 
-        scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
-
-        notesContainer.getChildAt ( index ).setBackground ( getDrawable ( R.drawable.layout_bg_2 ) );
+        if (notes.size () > 0) {
+            scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
+            notesContainer.getChildAt ( index ).setBackground ( getDrawable ( R.drawable.layout_bg_2 ) );
+        }
 
         if (indexPrev >= 0 && index != indexPrev) {
             notesContainer.getChildAt ( indexPrev )
@@ -354,11 +352,22 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 });
                 return true;
             case R.id.clear_history:
-//                selectedNote = new Note ( -1, "", "", formatDate.format ( new Date () )  );
 
                 presenter.clearDb ( );
+                notes = presenter.refresh ();
+                index = 0;
+                indexPrev = -1;
 
-                recreate ( );
+                FragmentManager fm = getSupportFragmentManager ( );
+                fm.popBackStack ( );
+                fm.beginTransaction ( )
+                        .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                        .commit ( );
+                if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    showDetails ( );
+//                    savePosition ( );
+                }
+//                recreate ();
                 return true;
             default:
                 return super.onOptionsItemSelected ( item );
