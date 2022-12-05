@@ -94,6 +94,7 @@ public class NotesListFragment extends Fragment {
     }
 
     public void showNotes(List<Note> notes) {
+        notesContainer.removeAllViews ();
         for (Note note : notes) {
 
             View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );

@@ -17,7 +17,6 @@
         android:id="@+id/clear_history"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="@string/clear_history"
-        android:checkable="true"
-        app:showAsAction="always">
+        app:showAsAction="never">
     </item>
 </menu>

@@ -1,5 +1,6 @@
 package com.example.my_notes.ui.list;
 
+import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.domain.NotesRepository;
 
@@ -11,10 +12,6 @@ public class NotesListPresenter {
 
     public NotesListPresenter(NotesRepository repository) {
         this.repository = repository;
-    }
-
-    public List<Note> refresh() {
-        return repository.getAllNotes();
     }
 
     public void upgradeNote(Note note) {
@@ -33,11 +30,30 @@ public class NotesListPresenter {
         return repository.searchDb(text);
     }
 
+    public int checkGroupFor(String text){
+        return repository.checkGroupForDbGroup ( text );
+    }
+
     public void deleteIndex(long index) {
         repository.deleteIndex(index);
     }
 
     public void closeDb() {
         repository.closeDb ();
+    }
+
+    public List<Note> refreshNotes() {
+        return repository.getAllNotes();
+    }
+    public List<Group> refreshGroup() {
+        return repository.getAllGroup ();
+    }
+
+    public Group addGroup(Group group) {
+        return repository.addGroup(group);
+    }
+
+    public Group searchByGroupName(String folderName) {
+        return repository.searchByGroupName(folderName);
     }
 }

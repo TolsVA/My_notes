@@ -10,14 +10,14 @@
         android:id="@+id/title_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:autofillHints="name"
         android:hint="@string/title"
+        android:inputType="text"
         android:textSize="@dimen/text_size_date_3"
         app:layout_constraintBottom_toTopOf="@id/data_detail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:inputType="text"
-        android:autofillHints="name" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/data_detail"
@@ -34,23 +34,26 @@
         android:id="@+id/text_detail"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:autofillHints="name"
         android:gravity="top"
         android:hint="@string/text"
-        android:textSize="@dimen/text_size_date_3"
         android:inputType="text"
-        android:autofillHints="name"
-        app:layout_constraintBottom_toTopOf="@+id/button_1"
+        android:textSize="@dimen/text_size_date_3"
+        app:layout_constraintTop_toBottomOf="@id/data_detail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/data_detail" />
-
+        app:layout_constraintBottom_toTopOf="@id/button_save"/>
 
     <Button
-        android:id="@+id/button_1"
+        android:id="@+id/button_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/save"
+        android:text="@string/save"
+        android:gravity="center"
+        android:textSize="@dimen/text_size_date_3"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/text_detail" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

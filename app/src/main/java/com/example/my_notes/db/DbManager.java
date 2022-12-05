@@ -9,6 +9,7 @@ import android.provider.BaseColumns;
 
 import androidx.annotation.RequiresApi;
 
+import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 
 import java.util.ArrayList;
@@ -24,35 +25,37 @@ public class DbManager {
     // вы фактически будете использовать после этого запроса.
     String[] projection = {
             BaseColumns._ID,
-            Constants.COLUMN_NAME_TITLE,
-            Constants.COLUMN_NAME_CONTENT,
-            Constants.COLUMN_NAME_DATA
+            Constants.FeedEntryNote.NOTE_TITLE,
+            Constants.FeedEntryNote.NOTE_CONTENT,
+            Constants.FeedEntryNote.NOTE_DATA
     };
 
     //Отфильтровать результаты, WHERE "название" = "Мое название"
-    String selection = Constants.COLUMN_NAME_TITLE + " = ?";
+    String selection = Constants.FeedEntryNote.NOTE_TITLE + " = ?";
     String[] selectionArgs = { "My Title" };
 
     // Как вы хотите, чтобы результаты сортировались в результирующем курсоре
     String sortOrder =
-            Constants.COLUMN_NAME_TITLE + " DESC";
+            Constants.FeedEntryNote.NOTE_ID + " DESC";
+
 
     public DbManager(Context context) {
         dbHelper = new DbHelper(context);
     }
 
     public void openDb() {
-        db = dbHelper.getWritableDatabase();
+        db = dbHelper.getReadableDatabase();
     }
 
-    public Note insertToDb(Note note) {
+    public Note insertToDbNote(Note note) {
         ContentValues cv = new ContentValues();
-        cv.put( Constants.COLUMN_NAME_TITLE, note.getTitle());
-        cv.put( Constants.COLUMN_NAME_CONTENT, note.getText());
-        cv.put( Constants.COLUMN_NAME_DATA, note.getData());
+        cv.put( Constants.FeedEntryNote.NOTE_TITLE, note.getTitle());
+        cv.put( Constants.FeedEntryNote.NOTE_CONTENT, note.getText());
+        cv.put( Constants.FeedEntryNote.NOTE_DATA, note.getData());
+        cv.put( Constants.FeedEntryNote.NOTE_GROUP_ID, note.getFolderName ());
         // Вставляем новую строку, возвращая значение первичного ключа новой строки
-        long newRowId = db.insert( Constants.TABLE_NAME, null, cv);
-        cv.put( Constants._ID, newRowId);
+        long newRowId = db.insert( Constants.FeedEntryNote.TABLE_NOTE, null, cv);
+        cv.put( Constants.FeedEntryNote.NOTE_ID, newRowId);
 
         note.setIndex(newRowId);
         return note;
@@ -60,46 +63,50 @@ public class DbManager {
 
     public void upgradeEntry(Note note) {
         ContentValues cv = new ContentValues();
-        cv.put( Constants._ID, note.getIndex());
-        cv.put( Constants.COLUMN_NAME_TITLE, note.getTitle());
-        cv.put( Constants.COLUMN_NAME_CONTENT, note.getText());
-        cv.put( Constants.COLUMN_NAME_DATA, note.getData());
-        String where = Constants._ID + "=" + note.getIndex();
-        db.update( Constants.TABLE_NAME, cv, where, null);
+        cv.put( Constants.FeedEntryNote.NOTE_ID, note.getIndex());
+        cv.put( Constants.FeedEntryNote.NOTE_TITLE, note.getTitle());
+        cv.put( Constants.FeedEntryNote.NOTE_CONTENT, note.getText());
+        cv.put( Constants.FeedEntryNote.NOTE_DATA, note.getData());
+        cv.put( Constants.FeedEntryNote.NOTE_GROUP_ID, note.getFolderName ());
+        String where = Constants.FeedEntryNote.NOTE_ID + "=" + note.getIndex();
+        db.update( Constants.FeedEntryNote.TABLE_NOTE, cv, where, null);
     }
 
     public void deleteEntry(long index) {
-        db.delete( Constants.TABLE_NAME, Constants._ID + " = " + index, null);
+        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_ID + " = " + index, null);
 //        Toast.makeText(context, String.valueOf(index), Toast.LENGTH_SHORT).show();
     }
 
     public List<Note> getFromDb(){
         Cursor cursor = db.query(
-                Constants.TABLE_NAME,    // Таблица для запроса
+                Constants.FeedEntryNote.TABLE_NOTE,    // Таблица для запроса
                 null,           // Массив возвращаемых столбцов
                 null,          // Столбцы для предложения WHERE
                 null,       // значения для предложения WHERE
                 null,          // не группировать строки
                 null,            // не фильтровать по группам строк
-                sortOrder           // Порядок сортировки
+                sortOrder          // Порядок сортировки
         );
 
         List<Note> notes = new ArrayList<>();
         while(cursor.moveToNext()) {
 
             long index = cursor.getLong(
-                    cursor.getColumnIndexOrThrow( Constants._ID));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_ID));
 
             String title = cursor.getString(
-                    cursor.getColumnIndexOrThrow( Constants.COLUMN_NAME_TITLE));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_TITLE));
 
             String text = cursor.getString(
-                    cursor.getColumnIndexOrThrow( Constants.COLUMN_NAME_CONTENT));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_CONTENT));
 
             String data = cursor.getString(
-                    cursor.getColumnIndexOrThrow( Constants.COLUMN_NAME_DATA));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_DATA));
 
-            Note note = new Note(index, title, text, data);
+            int folderName = cursor.getInt (
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_GROUP_ID));
+
+            Note note = new Note(index, title, text, data, folderName);
             notes.add(note);
         }
         cursor.close();
@@ -107,7 +114,8 @@ public class DbManager {
     }
 
     public void clearDb() {
-        db.delete( Constants.TABLE_NAME, null, null);
+        db.delete( Constants.FeedEntryNote.TABLE_NOTE, null, null);
+        db.delete( Constants.FeedEntryGroup.TABLE_GROUP, null, null);
     }
 
 
@@ -118,9 +126,9 @@ public class DbManager {
     @RequiresApi(api = Build.VERSION_CODES.N)
     public List<Note> searchDb(String _text) {
 
-        String sql = "SELECT * FROM " + Constants.TABLE_NAME + " WHERE " +
-                Constants.COLUMN_NAME_TITLE + " GLOB " + "\"*" +  _text + "*\"" +
-                " OR " + Constants.COLUMN_NAME_CONTENT + " GLOB " + "\"*" +  _text + "*\"";
+        String sql = "SELECT * FROM " + Constants.FeedEntryNote.TABLE_NOTE + " WHERE " +
+                Constants.FeedEntryNote.NOTE_TITLE + " GLOB " + "\"*" +  _text + "*\"" +
+                " OR " + Constants.FeedEntryNote.NOTE_CONTENT + " GLOB " + "\"*" +  _text + "*\"";
 
         Cursor cursor = db.rawQuery ( sql, null, null );
 
@@ -128,18 +136,18 @@ public class DbManager {
         while(cursor.moveToNext ()) {
 
             long index = cursor.getLong(
-                    cursor.getColumnIndexOrThrow(Constants._ID));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_ID));
 
             String title = cursor.getString(
-                    cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_TITLE));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_TITLE));
 
             String text = cursor.getString(
-                    cursor.getColumnIndexOrThrow(Constants.COLUMN_NAME_CONTENT));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_CONTENT));
 
             String data = cursor.getString(
-                    cursor.getColumnIndexOrThrow( Constants.COLUMN_NAME_DATA));
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryNote.NOTE_DATA));
 
-            Note note = new Note(index, title, text, data);
+            Note note = new Note(index, title, text, data, 1);
             notes.add(note);
         }
         cursor.close();
@@ -147,4 +155,95 @@ public class DbManager {
         return notes;
     }
 
+    public Group insertToDbGroup(Group group) {
+        ContentValues cv = new ContentValues();
+        cv.put( Constants.FeedEntryGroup.GROUP_NAME, group.getName ());
+        cv.put( Constants.FeedEntryGroup.GROUP_ICON, group.getIcon ());
+        // Вставляем новую строку, возвращая значение первичного ключа новой строки
+        long newRowId = db.insert( Constants.FeedEntryGroup.TABLE_GROUP, null, cv);
+        cv.put( Constants.FeedEntryGroup.GROUP_ID, newRowId);
+
+        group.setIndex(newRowId);
+        return group;
+    }
+
+    public List<Group> getFromDbGroup(){
+        Cursor cursor = db.query(
+                Constants.FeedEntryGroup.TABLE_GROUP,    // Таблица для запроса
+                null,           // Массив возвращаемых столбцов
+                null,          // Столбцы для предложения WHERE
+                null,       // значения для предложения WHERE
+                null,          // не группировать строки
+                null,            // не фильтровать по группам строк
+                null         // Порядок сортировки
+        );
+
+        List<Group> groups = new ArrayList<>();
+        while(cursor.moveToNext()) {
+
+            long index = cursor.getLong(
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryGroup.GROUP_ID));
+
+            String name = cursor.getString(
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryGroup.GROUP_NAME));
+
+            int icon = cursor.getInt (
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryGroup.GROUP_ICON));
+
+            Group group = new Group (index, name, icon);
+            groups.add(group);
+        }
+        cursor.close();
+        return groups;
+    }
+
+    public int checkGroupForDbGroup(String _text) {
+
+        String sql = "SELECT COUNT(*) as count FROM " + Constants.FeedEntryGroup.TABLE_GROUP + " WHERE " +
+                Constants.FeedEntryGroup.GROUP_NAME + " = \"" + _text + "\"";
+
+        Cursor cursor = db.rawQuery ( sql, null, null );
+
+        int index = 0;
+        while(cursor.moveToNext ()) {
+            index = cursor.getInt (
+                    cursor.getColumnIndexOrThrow ( "count" ));
+        }
+        cursor.close();
+
+        return index;
+    }
+
+    public Group searchByGroupNameDbGroup(String folderName) {
+
+        String selection = Constants.FeedEntryGroup.GROUP_NAME + " = ?";
+        String[] selectionArgs = { folderName };
+        Cursor cursor = db.query(
+                Constants.FeedEntryGroup.TABLE_GROUP,    // Таблица для запроса
+                null,           // Массив возвращаемых столбцов
+                selection ,          // Столбцы для предложения WHERE
+                selectionArgs,       // значения для предложения WHERE
+                null,          // не группировать строки
+                null,            // не фильтровать по группам строк
+                null         // Порядок сортировки
+        );
+
+        Group group = null;
+        while(cursor.moveToNext()) {
+
+            long index = cursor.getLong(
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryGroup.GROUP_ID));
+
+            String name = cursor.getString(
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryGroup.GROUP_NAME));
+
+            int icon = cursor.getInt (
+                    cursor.getColumnIndexOrThrow( Constants.FeedEntryGroup.GROUP_ICON));
+
+            group = new Group (index, name, icon);
+        }
+        cursor.close();
+        return group;
+
+    }
 }

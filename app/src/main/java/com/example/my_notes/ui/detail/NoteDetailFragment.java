@@ -1,18 +1,24 @@
 package com.example.my_notes.ui.detail;
 
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.my_notes.R;
+import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 
 public class NoteDetailFragment extends Fragment {
@@ -20,18 +26,22 @@ public class NoteDetailFragment extends Fragment {
     public static final String TAG = "NoteDetailFragment";
 
     public static final String ARG_NOTE = "ARG_NOTE";
+    public static final String ARG_GROUP = "ARG_GROUP";
+    public static final String ARG_NEW_GROUP = "ARG_NEW_GROUP";
 
     public static final String ARG_NEW_NOTE = "ARG_NEW_NOTE";
 
     public static final String RESULT_KEY_DETAIL_FRAGMENT = "NoteDetailFragment_RESULT_KEY_DETAIL_FRAGMENT";
-
+    public static final String RESULT_KEY_GROUP_FRAGMENT = "NoteDetailFragment_RESULT_KEY_GROUP_FRAGMENT";
     private Note note;
 
     private EditText titleView, textView;
 
     private TextView dataView;
 
-    private Button button;
+    private Button btnSave;
+
+    public Group group;
 
     public static NoteDetailFragment newInstance(Note note) {
         NoteDetailFragment fragment = new NoteDetailFragment();
@@ -65,7 +75,7 @@ public class NoteDetailFragment extends Fragment {
 
         dataView = view.findViewById(R.id.data_detail);
 
-        button = view.findViewById(R.id.button_1);
+        btnSave = view.findViewById(R.id.button_save);
 
         displayDetails(note);
 
@@ -94,15 +104,40 @@ public class NoteDetailFragment extends Fragment {
         } );
 
 
-        button.setOnClickListener( view -> {
+        btnSave.setOnClickListener( view -> {
             note.setTitle(titleView.getText().toString());
             note.setText(textView.getText().toString());
             note.setData (dataView.getText().toString());
+            Activity activity = requireActivity();
+            PopupMenu popupMenu = new PopupMenu(activity, view);
+            activity.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());
 
-            Bundle data = new Bundle();
-            data.putParcelable(ARG_NEW_NOTE, note);
-            getParentFragmentManager()
-                    .setFragmentResult(RESULT_KEY_DETAIL_FRAGMENT, data);
+            popupMenu.setOnMenuItemClickListener ( new PopupMenu.OnMenuItemClickListener ( ) {
+                @SuppressLint("NonConstantResourceId")
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    switch (item.getItemId ( )) {
+                        case R.id.save_to_default_older:
+                            Bundle data = new Bundle();
+                            data.putParcelable(ARG_NEW_NOTE, note);
+                            getParentFragmentManager()
+                                    .setFragmentResult(RESULT_KEY_DETAIL_FRAGMENT, data);
+                            return true;
+                        case R.id.save_to_new_folder:
+                            Toast.makeText ( activity, item.getTitle (), Toast.LENGTH_SHORT ).show ( );
+                            return true;
+                        case R.id.save_to_folder_of_choice:
+                            Bundle data1 = new Bundle();
+                            data1.putParcelable(ARG_NEW_GROUP, note);
+                            getParentFragmentManager()
+                                    .setFragmentResult(RESULT_KEY_GROUP_FRAGMENT, data1);
+                            return true;
+                        default:
+                            return false;
+                    }
+                }
+            } );
+            popupMenu.show();
         } );
     }
 }

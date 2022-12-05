@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer-array name="coat_of_arms_images">
+        <item>@drawable/ic_baseline_house_24</item>
+        <item>@drawable/ic_baseline_work_24</item>
+        <item>@drawable/ic_baseline_local_airport_24</item>
+        <item>@drawable/ic_baseline_connecting_airports_24</item>
+        <item>@drawable/ic_baseline_directions_run_24</item>
+        <item>@drawable/ic_baseline_school_24</item>
+        <item>@drawable/ic_baseline_people_alt_24</item>
+    </integer-array>
+</resources>

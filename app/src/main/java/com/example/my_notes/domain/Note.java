@@ -13,45 +13,15 @@ public class Note implements Parcelable{
 
     private String data;
 
-    public Note(long index, String title, String text, String data) {
+    private long folderName;
+
+    public Note(long index, String title, String text, String data, long folderName) {
         this.index = index;
         this.title = title;
         this.text = text;
         this.data = data;
-
+        this.folderName = folderName;
     }
-
-    protected Note(Parcel in) {
-        index = in.readLong();
-        title = in.readString();
-        text = in.readString();
-        data = in.readString();
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong(index);
-        dest.writeString(title);
-        dest.writeString(text);
-        dest.writeString(data);
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    public static final Creator<Note> CREATOR = new Creator<Note>() {
-        @Override
-        public Note createFromParcel(Parcel in) {
-            return new Note(in);
-        }
-
-        @Override
-        public Note[] newArray(int size) {
-            return new Note[size];
-        }
-    };
 
     public long getIndex() {
         return index;
@@ -85,4 +55,45 @@ public class Note implements Parcelable{
         this.data = data;
     }
 
+    public long getFolderName() {
+        return folderName;
+    }
+
+    public void setFolderName(long folderName) {
+        this.folderName = folderName;
+    }
+
+    protected Note(Parcel in) {
+        index = in.readLong ( );
+        title = in.readString ( );
+        text = in.readString ( );
+        data = in.readString ( );
+        folderName = in.readLong ( );
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeLong ( index );
+        dest.writeString ( title );
+        dest.writeString ( text );
+        dest.writeString ( data );
+        dest.writeLong ( folderName );
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<Note> CREATOR = new Creator<Note> ( ) {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note ( in );
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
 }

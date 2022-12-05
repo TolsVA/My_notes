@@ -6,6 +6,8 @@ public interface NotesRepository {
 
     List<Note> getAllNotes();
 
+    List<Group> getAllGroup();
+
     void upgradeNote(Note note);
 
     Note addNote(Note note);
@@ -17,5 +19,11 @@ public interface NotesRepository {
     void closeDb();
 
     List<Note> searchDb(String text);
+
+    Group addGroup(Group group);
+
+    int checkGroupForDbGroup(String text);
+
+    Group searchByGroupName(String folderName);
 
 }

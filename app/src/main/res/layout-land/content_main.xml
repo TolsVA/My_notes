@@ -4,35 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/grey"
+    android:baselineAligned="false"
     android:orientation="horizontal"
-    tools:context=".MainActivity"
-    android:baselineAligned="false">
+    android:background="@drawable/side_nav_bar"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context=".MainActivity">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="2"
-        android:background="@color/grey"
+        android:layout_weight="1"
+        android:background="@color/df"
         android:orientation="vertical">
 
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/margin_10"
-            android:layout_marginBottom="@dimen/margin_10">
-
-            <com.google.android.material.floatingactionbutton.FloatingActionButton
-                android:id="@+id/fab"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="bottom|end"
-                android:layout_marginEnd="@dimen/fab_margin"
-                android:layout_marginBottom="@dimen/fab_margin"
-                android:contentDescription="@string/todo"
-                app:srcCompat="@android:drawable/ic_input_add" />
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginBottom="10dp"/>
 
     </LinearLayout>
 
@@ -40,9 +30,9 @@
         android:id="@+id/coordinator_detail"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/margin_10"
-        android:layout_marginVertical="@dimen/margin_vertical"
-        android:layout_weight="3">
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginVertical="8dp"
+        android:layout_weight="1">
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/fragment_container_detail"

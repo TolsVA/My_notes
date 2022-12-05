@@ -1,10 +1,13 @@
 package com.example.my_notes;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.Toolbar;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -23,6 +26,7 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapter;
@@ -48,6 +52,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     public Note note, newNote;
 
+    public Group group;
+
+    public List<Group> groups;
+
     public int index = 0;
 
     public int indexPrev = -1;
@@ -63,6 +71,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     public List<Note> deleteNotes;
 
     private NotesListPresenter presenter;
+
+    private Toolbar toolbar;
+
+    private DrawerLayout drawer;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -86,6 +98,10 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        toolbar = findViewById(R.id.toolbar);
+
+        setSupportActionBar(toolbar);
+
         deleteNotes = new ArrayList<> ( );
 
         pref = getSharedPreferences("TABLE", MODE_PRIVATE);
@@ -94,7 +110,11 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
         presenter = new NotesListPresenter ( new InMemoryRepository(this) );
 
-        notes = presenter.refresh ();
+        notes = presenter.refreshNotes ();
+
+        drawer = findViewById(R.id.drawer);
+
+        supplyToolbar();
 
         coordinatorLayout = findViewById(R.id.fragment_container);
 
@@ -106,7 +126,16 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             fab.setVisibility(View.GONE);
             view.setClickable(false);
             view.setVisibility(View.GONE);
-            newNote = new Note(-1, "", "", String.valueOf (new Date ()));
+
+            String folderName = getString ( R.string.Uncategorized );
+            if (presenter.checkGroupFor ( folderName ) == 0) {
+                group = new Group ( -1, folderName, R.drawable.ic_baseline_folder_copy_24 );
+                group = presenter.addGroup ( group );
+            } else {
+                group = presenter.searchByGroupName( folderName );
+            }
+
+            newNote = new Note(-1, "", "", String.valueOf (new Date ()), group.getIndex ());
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
                 pager.setAdapter(changeContent( Collections.singletonList(newNote)));
             } else {
@@ -119,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 fmDetail.beginTransaction()
                         .remove(fmList)
                         .addToBackStack("")
-                        .replace(R.id.fragment_container, NoteDetailFragment.newInstance(newNote), NoteDetailFragment.TAG)
+                        .add(R.id.fragment_container, NoteDetailFragment.newInstance(newNote), NoteDetailFragment.TAG)
                         .commit();
             }
             selectPosition();
@@ -179,15 +208,16 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         getSupportFragmentManager ( )
                 .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
                     note = result.getParcelable ( NoteDetailFragment.ARG_NEW_NOTE );
+
                     fab.setVisibility ( View.VISIBLE );
                     fab.setClickable(true);
 
                     if (note.getIndex ( ) != -1) {
                         presenter.upgradeNote ( note );
-                        notes = presenter.refresh ();
+                        notes = presenter.refreshNotes ();
                     } else {
                         presenter.addNote ( note );
-                        notes = presenter.refresh ();
+                        notes = presenter.refreshNotes ();
                         indexPrev = index;
                         index = 0;
                         note = notes.get ( index );
@@ -213,10 +243,35 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                         }
                     }
 
+                    //Перерисовать фрагмент способ 1
+                    fm.popBackStack ();
                     fm.beginTransaction ( )
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
 
+//                    // Перерисовать фрагмент способ 2 найти фрагмент по TAG
+//                    Fragment fmList = getSupportFragmentManager ( )
+//                            .findFragmentByTag ( NotesListFragment.TAG );
+//                    fm.popBackStack ();
+//                    assert fmList != null;
+//                    ((NotesListFragment)fmList).showNotes(notes);
+//
+//                    //Перерисовать фрагмент способ 3 найти фрагмент пройдя по стеку фрагментов this.getSupportFragmentManager ().getFragments ()
+//                    for (Fragment fragment : this.getSupportFragmentManager ().getFragments ()) {
+//                        if (fragment instanceof NotesListFragment) {
+//                            ((NotesListFragment) fragment).showNotes ( notes );
+//                            break;
+//                        }
+//                    }
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_GROUP_FRAGMENT, this, (requestKey, result) -> {
+                    groups = presenter.refreshGroup ();
+
+                    fm.beginTransaction ( )
+                            .replace ( R.id.fragment_container, GroupFragment.newInstance ( groups ), GroupFragment.TAG )
+                            .commit ( );
                 } );
 
         getSupportFragmentManager ( )
@@ -312,6 +367,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     .beginTransaction ( )
                     .show ( fmList )
                     .commit ( );
+
 //            savePosition();
         }
         super.onBackPressed ( );
@@ -341,7 +397,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     @Override
                     public boolean onQueryTextChange(String newText) {
                         int index2 = -1;
-                        notes = presenter.search (newText );
+                        notes = presenter.search ( newText );
                         FragmentManager fm = getSupportFragmentManager();
                         fm.popBackStack();
                         fm.beginTransaction()
@@ -354,7 +410,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
             case R.id.clear_history:
 
                 presenter.clearDb ( );
-                notes = presenter.refresh ();
+                notes = presenter.refreshNotes ();
                 index = 0;
                 indexPrev = -1;
 
@@ -378,5 +434,17 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     public void applySettings(String text, int id) {
         TextView textView = findViewById ( id );
         textView.setText ( text );
+    }
+
+    public void supplyToolbar() {
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this,
+                drawer,
+                toolbar,
+                R.string.nav_app_bar_navigate_up_description,
+                R.string.nav_app_bar_navigate_up_description
+        );
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
     }
 }

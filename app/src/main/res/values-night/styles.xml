@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--    <style name="Toolbar" parent="Theme.MaterialComponents.DayNight">-->
+    <!--        <item name="android:layout_width">match_parent</item>-->
+    <!--        <item name="android:layout_height">?attr/actionBarSize</item>-->
+    <!--&lt;!&ndash;        <item name="theme">@style/ThemeOverlay.AppCompat.Dark.ActionBar</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <item name="android:background">?colorPrimary</item>&ndash;&gt;-->
+    <!--&lt;!&ndash;        <item name="android:fillColor">?android:attr/textColor</item>&ndash;&gt;-->
+    <!--    </style>-->
+</resources>
