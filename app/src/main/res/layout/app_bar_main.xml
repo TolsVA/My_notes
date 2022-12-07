@@ -7,19 +7,7 @@
     android:background="@drawable/side_nav_bar"
     tools:context=".MainActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Theme.My_Notes.NoActionBar">
-
-        <com.google.android.material.appbar.MaterialToolbar
-            android:id="@+id/toolbar"
-            style="@style/Toolbar"
-            app:title="Привет"
-            app:subtitle="макак"
-            app:popupTheme="@style/Theme.Nav_drawer.PopupOverlay"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
+<!--    <include layout="@layout/toolbar_main" />-->
 
     <include layout="@layout/content_main" />
 
@@ -29,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
-        android:layout_marginBottom="16dp"
+        android:layout_marginBottom="72dp"
         app:srcCompat="@drawable/ic_baseline_add_24"
         android:contentDescription="@string/todo" />
 

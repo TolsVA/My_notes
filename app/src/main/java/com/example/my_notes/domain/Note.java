@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 public class Note implements Parcelable{
 
-    private long index;
+    private long id;
 
     private String title;
 
@@ -13,22 +13,22 @@ public class Note implements Parcelable{
 
     private String data;
 
-    private long folderName;
+    private long group_id;
 
-    public Note(long index, String title, String text, String data, long folderName) {
-        this.index = index;
+    public Note(long _id, String title, String text, String data, long _group_id) {
+        this.id = _id;
         this.title = title;
         this.text = text;
         this.data = data;
-        this.folderName = folderName;
+        this.group_id = _group_id;
     }
 
     public long getIndex() {
-        return index;
+        return id;
     }
 
     public void setIndex(long index) {
-        this.index = index;
+        this.id = index;
     }
 
     public String getTitle() {
@@ -55,29 +55,29 @@ public class Note implements Parcelable{
         this.data = data;
     }
 
-    public long getFolderName() {
-        return folderName;
+    public long getGroup_id() {
+        return group_id;
     }
 
-    public void setFolderName(long folderName) {
-        this.folderName = folderName;
+    public void setGroup_id(long _group_id) {
+        this.group_id = _group_id;
     }
 
     protected Note(Parcel in) {
-        index = in.readLong ( );
+        id = in.readLong ( );
         title = in.readString ( );
         text = in.readString ( );
         data = in.readString ( );
-        folderName = in.readLong ( );
+        group_id = in.readLong ( );
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong ( index );
+        dest.writeLong ( id );
         dest.writeString ( title );
         dest.writeString ( text );
         dest.writeString ( data );
-        dest.writeLong ( folderName );
+        dest.writeLong ( group_id );
     }
 
     @Override

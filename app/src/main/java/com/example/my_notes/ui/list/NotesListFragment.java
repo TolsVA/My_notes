@@ -1,22 +1,42 @@
 package com.example.my_notes.ui.list;
 
 import android.annotation.SuppressLint;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.widget.NestedScrollView;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
+import com.example.my_notes.GroupFragment;
+import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Note;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationBarView;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +55,10 @@ public class NotesListFragment extends Fragment {
 
     public static final String ARG_NOTE = "ARG_NOTE";
 
+    public static final String ARG_DELETE_NOTE = "ARG_DELETE_NOTE";
+
+    public static final String DELETE_NOTE_KEY = "DELETE_NOTE_KEY";
+
     public static final String ARG_INDEX = "ARG_INDEX";
 
     public static final String RESULT_KEY = "NotesListFragment_RESULT";
@@ -44,6 +68,10 @@ public class NotesListFragment extends Fragment {
     public static final String CREATE_DELETE_KEY = "NotesListFragment_CREATE_DELETE";
 
     public int index;
+
+    public TextView deleteCounter;
+    public TextView counter;
+    public ImageView chooseAll;
 
     public NotesListFragment() {
     }
@@ -57,7 +85,6 @@ public class NotesListFragment extends Fragment {
         fragment.setArguments ( args );
         return fragment;
     }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,6 +107,93 @@ public class NotesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated ( view, savedInstanceState );
 
+        NavigationView navigationView = view.findViewById ( R.id.nav_view );
+
+        BottomNavigationView bottomNavigationView = view.findViewById ( R.id.bottom_navigation );
+        bottomNavigationView.setVisibility ( View.GONE );
+
+        MenuItem menuItem = (MenuItem)bottomNavigationView.getMenu ().getItem ( 0 );
+        menuItem.setCheckable ( false );
+
+        bottomNavigationView.setOnItemSelectedListener ( new NavigationBarView.OnItemSelectedListener ( ) {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setCheckable ( false );
+                switch (item.getItemId ( )) {
+                    case R.id.search:
+
+                    case R.id.move:
+                        Toast.makeText ( requireContext ( ), "Здесь что-то будет", Toast.LENGTH_SHORT ).show ( );
+                        return true;
+                    case R.id.delete_selected_notes:
+                        Bundle data = new Bundle ( );
+                        data.putParcelableArrayList ( ARG_DELETE_NOTE, (ArrayList<? extends Parcelable>) deleteNotes );
+
+                        getParentFragmentManager ( )
+                                .setFragmentResult ( DELETE_NOTE_KEY, data );
+                        return true;
+                }
+                return false;
+            }
+        } );
+
+        Toolbar toolbar = view.findViewById ( R.id.toolbar );
+        LinearLayout layoutToolbar = view.findViewById ( R.id.layout_toolbar );
+
+//        deleteCounter = view.findViewById ( R.id.delete_counter );
+//        deleteCounter.setOnClickListener ( new View.OnClickListener ( ) {
+//            @Override
+//            public void onClick(View view) {
+//                deleteNotes.clear ( );
+//                Bundle data = new Bundle ( );
+//                data.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
+//
+//                getParentFragmentManager ( )
+//                        .setFragmentResult ( ADD_DELETE_KEY, data );
+//            }
+//        } );
+//
+//        counter = view.findViewById ( R.id.counter );
+//        if (deleteNotes.size ( ) > 0) {
+//            counter.setText ( "Выбрано: " + deleteNotes.size ( ) );
+//        }
+//
+//        chooseAll = view.findViewById ( R.id.choose_all );
+//        chooseAll.setOnClickListener ( new View.OnClickListener ( ) {
+//            @Override
+//            public void onClick(View view) {
+//                if (deleteNotes.size ( ) == notes.size ( )) {
+//                    deleteNotes.clear ( );
+//                } else {
+//                    deleteNotes.clear ( );
+//                    deleteNotes.addAll ( notes );
+//                }
+//                Bundle data = new Bundle ( );
+//                data.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
+//
+//                getParentFragmentManager ( )
+//                        .setFragmentResult ( ADD_DELETE_KEY, data );
+//            }
+//        } );
+
+        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            if (deleteNotes.size ( ) > 0) {
+                bottomNavigationView.setVisibility ( View.VISIBLE );
+            }
+        }
+
+//        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
+//            if (deleteNotes.size ( ) == 0) {
+//                ((MainActivity) requireActivity ( )).supplyToolbar ( toolbar );
+//            } else {
+//                toolbar.getMenu ( ).clear ( );
+//                layoutToolbar.setVisibility ( View.VISIBLE );
+//                bottomNavigationView.setVisibility ( View.VISIBLE );
+//            }
+//        } else {
+//            toolbar.setVisibility ( View.GONE );
+//        }
+
         notesContainer = view.findViewById ( R.id.container_notes );
 
         showNotes ( notes );
@@ -88,13 +202,13 @@ public class NotesListFragment extends Fragment {
 
         scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
 
-        if (notes.size () != 0 && index >= 0) {
+        if (notes.size ( ) != 0 && index >= 0) {
             notesContainer.getChildAt ( index ).setBackground ( getResources ( ).getDrawable ( R.drawable.layout_bg_2, requireContext ( ).getTheme ( ) ) );
         }
     }
 
     public void showNotes(List<Note> notes) {
-        notesContainer.removeAllViews ();
+        notesContainer.removeAllViews ( );
         for (Note note : notes) {
 
             View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );
@@ -147,11 +261,22 @@ public class NotesListFragment extends Fragment {
                         deleteNotes.add ( note );
                     }
 
+                    checkBox.setOnClickListener ( new View.OnClickListener ( ) {
+                        @Override
+                        public void onClick(View view) {
+                            Bundle data1 = new Bundle ( );
+                            data1.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
+
+                            getParentFragmentManager ( )
+                                    .setFragmentResult ( CREATE_DELETE_KEY, data1 );
+                        }
+                    } );
+
                     Bundle data1 = new Bundle ( );
                     data1.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
 
                     getParentFragmentManager ( )
-                            .setFragmentResult ( ADD_DELETE_KEY, data1 );
+                            .setFragmentResult ( CREATE_DELETE_KEY, data1 );
                 } );
             } else {
                 itemView.setOnClickListener ( view -> {
@@ -161,9 +286,7 @@ public class NotesListFragment extends Fragment {
                     getParentFragmentManager ( )
                             .setFragmentResult ( RESULT_KEY, data12 );
                 } );
-            }
 
-            if (deleteNotes.size ( ) == 0) {
                 itemView.setOnLongClickListener ( view -> {
                     checkBox.setVisibility ( View.VISIBLE );
                     checkBox.setChecked ( true );

@@ -5,29 +5,34 @@ import android.os.Parcelable;
 
 public class Group implements Parcelable {
 
-    private long index;
+    private long id;
 
     private String name;
 
     private int icon;
 
-    public Group(long index, String name, int icon) {
-        this.index = index;
+    private int count;
+
+    public Group(long id, String name, int icon, int count) {
+        this.id = id;
         this.name = name;
         this.icon = icon;
+        this.count = count;
     }
 
     protected Group(Parcel in) {
-        index = in.readLong ( );
+        id = in.readLong ( );
         name = in.readString ( );
         icon = in.readInt ( );
+        count = in.readInt ( );
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeLong ( index );
+        dest.writeLong ( id );
         dest.writeString ( name );
         dest.writeInt ( icon );
+        dest.writeInt ( count );
     }
 
     @Override
@@ -47,12 +52,12 @@ public class Group implements Parcelable {
         }
     };
 
-    public long getIndex() {
-        return index;
+    public long getId() {
+        return id;
     }
 
-    public void setIndex(long index) {
-        this.index = index;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -71,5 +76,11 @@ public class Group implements Parcelable {
         this.icon = icon;
     }
 
+    public int getCount() {
+        return count;
+    }
 
+    public void setCount(int count) {
+        this.count = count;
+    }
 }

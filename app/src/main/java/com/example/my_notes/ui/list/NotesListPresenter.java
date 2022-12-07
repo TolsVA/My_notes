@@ -42,8 +42,8 @@ public class NotesListPresenter {
         repository.closeDb ();
     }
 
-    public List<Note> refreshNotes() {
-        return repository.getAllNotes();
+    public List<Note> refreshNotes(long group_id) {
+        return repository.getAllNotes(group_id);
     }
     public List<Group> refreshGroup() {
         return repository.getAllGroup ();
@@ -53,7 +53,7 @@ public class NotesListPresenter {
         return repository.addGroup(group);
     }
 
-    public Group searchByGroupName(String folderName) {
+    public List<Group> searchByGroupName(String folderName) {
         return repository.searchByGroupName(folderName);
     }
 }

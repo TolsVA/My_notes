@@ -5,18 +5,12 @@
         android:id="@+id/search"
         android:title="@string/search"
         app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="always|collapseActionView">
+        app:showAsAction="ifRoom|collapseActionView">
     </item>
     <item
         android:id="@+id/note_folders"
         android:title="@string/note_folders"
         android:icon="@drawable/ic_baseline_folder_copy_24"
         app:showAsAction="ifRoom">
-    </item>
-    <item
-        android:id="@+id/clear_history"
-        android:icon="@android:drawable/ic_menu_delete"
-        android:title="@string/clear_history"
-        app:showAsAction="never">
     </item>
 </menu>

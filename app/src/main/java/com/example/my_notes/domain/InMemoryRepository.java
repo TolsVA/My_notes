@@ -1,6 +1,5 @@
 package com.example.my_notes.domain;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Build;
 
@@ -8,7 +7,6 @@ import androidx.annotation.RequiresApi;
 
 import com.example.my_notes.db.DbManager;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class InMemoryRepository implements NotesRepository {
@@ -28,8 +26,8 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
-    public List<Note> getAllNotes() {
-        notes = dbManager.getFromDb();
+    public List<Note> getAllNotes(long group_id) {
+        notes = dbManager.getFromDb(group_id);
         return notes;
     }
 
@@ -56,7 +54,7 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
-    public Group searchByGroupName(String folderName) {
+    public List<Group> searchByGroupName(String folderName) {
         return dbManager.searchByGroupNameDbGroup ( folderName );
     }
 

@@ -5,8 +5,10 @@ import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
+import com.example.my_notes.R;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.detail.NoteDetailFragment;
 
@@ -26,7 +28,12 @@ public class MyAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         Note note = notes.get(position);
-        return(NoteDetailFragment.newInstance(note));
+//        Fragment fragment = NoteDetailFragment.newInstance ( note );
+//        FragmentManager manager = fragment.getActivity ().getSupportFragmentManager ();
+//        manager.beginTransaction ()
+//                .addToBackStack ( "" )
+//                .commit ();
+        return(NoteDetailFragment.newInstance ( note ));
     }
 
     @Override

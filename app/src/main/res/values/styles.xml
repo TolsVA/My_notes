@@ -8,4 +8,9 @@
 <!--        <item name="android:background">?colorPrimary</item>-->
         <item name="android:background">@drawable/side_nav_bar</item>
     </style>
+    <style name="checkBoxStyle" parent="Base.Theme.AppCompat">
+        <item name="android:iconTint" tools:ignore="NewApi">@color/purple_700</item>
+<!--        <item name="colorAccent">@android:color/holo_orange_dark</item>-->
+<!--        <item name="android:textColorSecondary">@color/purple_700</item>-->
+    </style>
 </resources>

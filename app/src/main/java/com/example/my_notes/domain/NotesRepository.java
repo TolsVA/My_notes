@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface NotesRepository {
 
-    List<Note> getAllNotes();
+    List<Note> getAllNotes(long group_id);
 
     List<Group> getAllGroup();
 
@@ -24,6 +24,6 @@ public interface NotesRepository {
 
     int checkGroupForDbGroup(String text);
 
-    Group searchByGroupName(String folderName);
+    List<Group> searchByGroupName(String folderName);
 
 }
