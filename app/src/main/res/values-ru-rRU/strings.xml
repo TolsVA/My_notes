@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Заметки</string>
+    <string name="title">Заголовок</string>
+    <string name="text">Текст</string>
+    <string name="data">дата</string>
+    <string name="search_for_notes">Поиск заметок</string>
+    <string name="add_note">Добавить заметку</string>
+    <string name="remove_note">Удалить заметку</string>
+    <string name="note_folders">Папки с заметками</string>
+    <string name="clear_history">Удалить всё</string>
+    <string name="search">поиск</string>
+    <string name="save">сохранить</string>
+    <string name="delete">удалить</string>
+</resources>

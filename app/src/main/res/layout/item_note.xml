@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linear_layout_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginVertical="@dimen/margin_vertical_4"
+    android:background="@drawable/layout_bg">
+
+    <TextView
+        android:id="@+id/note_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/title"
+        android:textColor="@color/black"
+        android:textColorHint="@color/purple_700"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:layout_marginHorizontal="@dimen/margin_horizontal"
+        android:layout_marginVertical="@dimen/margin_vertical_4"/>
+
+    <TextView
+        android:id="@+id/note_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/text"
+        android:textColor="@color/black"
+        android:textColorHint="@color/purple_700"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:layout_marginHorizontal="@dimen/margin_horizontal"
+        android:layout_marginVertical="@dimen/margin_vertical_4"/>
+
+    <TextView
+        android:id="@+id/note_date"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="@string/data"
+        android:textColor="@color/black"
+        android:textColorHint="@color/purple_700"
+        android:textAppearance="@style/TextAppearance.Compat.Notification.Title"
+        android:layout_marginHorizontal="@dimen/margin_horizontal"
+        android:layout_marginVertical="@dimen/margin_vertical_4"/>
+
+    <Button
+        android:id="@+id/delete_index"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/delete"/>
+
+</LinearLayout>
