@@ -4,9 +4,14 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.1595" />
-        <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.22552083333333334" />
+        <entry key="app/src/main/res/drawable/layout_bg_2.xml" value="0.109" />
+        <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.18" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/activity_note_detail.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/fragment_note_detail.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_notes_list.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/item_note.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/view_pager2.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/main.xml" value="0.23072916666666668" />
       </map>
     </option>

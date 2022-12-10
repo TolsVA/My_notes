@@ -12,4 +12,5 @@
     <string name="search">поиск</string>
     <string name="save">сохранить</string>
     <string name="delete">удалить</string>
+    <string name="todo">TODO</string>
 </resources>

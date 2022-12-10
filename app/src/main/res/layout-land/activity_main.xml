@@ -1,47 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/grey"
     android:orientation="horizontal"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:baselineAligned="false">
 
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:layout_weight="2"
         android:background="@color/grey"
-        android:layout_weight="1"
         android:orientation="vertical">
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/scroll_list"
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="10dp">
+            android:layout_marginHorizontal="@dimen/margin_10"
+            android:layout_marginBottom="@dimen/margin_10">
 
-            <androidx.fragment.app.FragmentContainerView
-                android:id="@+id/fragment_container"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+            <com.google.android.material.floatingactionbutton.FloatingActionButton
+                android:id="@+id/fab"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|end"
+                android:layout_marginEnd="@dimen/fab_margin"
+                android:layout_marginBottom="@dimen/fab_margin"
+                android:contentDescription="@string/todo"
+                app:srcCompat="@android:drawable/ic_input_add" />
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
-        </androidx.core.widget.NestedScrollView>
     </LinearLayout>
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/scroll_detail"
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/coordinator_detail"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:layout_marginHorizontal="10dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp">
+        android:layout_marginHorizontal="@dimen/margin_10"
+        android:layout_marginVertical="@dimen/margin_vertical"
+        android:layout_weight="3">
 
-        <androidx.fragment.app.FragmentContainerView
+        <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/fragment_container_detail"
+            android:name="com.example.my_notes.ui.detail.NoteDetailFragment"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:name="com.example.my_notes.ui.detail.NoteDetailFragment"/>
+            android:layout_height="match_parent" />
 
-    </androidx.core.widget.NestedScrollView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </LinearLayout>
