@@ -4,21 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <item android:title="Инструменты">
+    <item android:title="@string/tools">
         <menu>
             <item
                 android:id="@+id/add_folder"
                 android:icon="@drawable/ic_baseline_create_new_folder_24"
-                android:title="Добавить папку"
+                android:title="@string/add_folder"
                 app:showAsAction="always|collapseActionView" />
             <item
                 android:id="@+id/delete_folder"
                 android:icon="@drawable/ic_baseline_folder_delete_24"
-                android:title="Удалить папку"
+                android:title="@string/delete_folder"
                 app:showAsAction="ifRoom" />
             <item
-                android:id="@+id/search"
-                android:title="поиск"
+                android:id="@+id/search_nav_list"
+                android:title="@string/search"
                 app:actionViewClass="android.widget.SearchView"
                 app:showAsAction="ifRoom|collapseActionView" />
         </menu>
@@ -26,9 +26,6 @@
     <group
         android:id="@+id/group"
         android:checkableBehavior="single"
-        android:title="Папки заметок"
+        android:title="@string/folder_notes"
         app:showAsAction="ifRoom" />
-
-
-
 </menu>

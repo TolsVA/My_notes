@@ -34,11 +34,18 @@
     <string name="save_to_new_folder">Сохранить в новую папку</string>
 
     <string name="hello_blank_fragment">Привет пустой фрагмент</string>
-    <string name="Uncategorized">Без категории</string>
+    <string name="uncategorized">Без категории</string>
 
     <string name="delete_selected_notes">Удалить</string>
     <string name="move">Переместить</string>
     <string name="choose_an_icon">Выбери иконку</string>
     <string name="Enter_folder_name">Введите имя папки</string>
     <string name="note_save">note save</string>
+    <string name="save_as">Сохранить как</string>
+    <string name="tools">Инструменты</string>
+    <string name="add_folder">Добавить папку</string>
+    <string name="delete_folder">Удалить папку</string>
+    <string name="folder_notes">Папка заметок</string>
+    <string name="delete">✕</string>
+    <string name="select_objects">Выберите обьекты</string>
 </resources>

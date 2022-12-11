@@ -19,8 +19,6 @@ public class InMemoryRepository implements NotesRepository {
     public List<Group> groups;
 
     public InMemoryRepository(Context context) {
-//        dbManagerGroup = new DbManagerCroup ( context );
-//        dbManagerGroup.openDb ();
         dbManager = new DbManager(context);
         dbManager.openDb();
     }
@@ -57,7 +55,6 @@ public class InMemoryRepository implements NotesRepository {
     public List<Group> searchByGroupName(String folderName) {
         return dbManager.searchByGroupNameDbGroup ( folderName );
     }
-
 
     @Override
     public void clearDb() {

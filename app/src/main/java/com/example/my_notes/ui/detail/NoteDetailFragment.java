@@ -4,23 +4,19 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
@@ -30,8 +26,6 @@ import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
 import com.example.my_notes.ui.dialog.MyDialogFragmentGroup;
-import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
-import com.google.android.material.navigation.NavigationBarView;
 
 import java.util.List;
 
@@ -73,7 +67,7 @@ public class NoteDetailFragment extends Fragment {
         if (getArguments() != null) {
             note = getArguments().getParcelable(ARG_NOTE);
         }
-        setHasOptionsMenu ( true );
+//        setHasOptionsMenu ( true );
 
 //        ActionBar actionBar = getSupportActionBar();
 //        assert actionBar != null;
@@ -90,7 +84,7 @@ public class NoteDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_note_detail, container, false);
+        return inflater.inflate(R.layout.note_detail_toolbar, container, false);
     }
 
 //    @Override
@@ -110,7 +104,7 @@ public class NoteDetailFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        drawer = view.findViewById ( R.id.drawer );
+//        drawer = view.findViewById ( R.id.drawer );
 //        Toolbar toolbar = view.findViewById ( R.id.toolbar );
 //        supplyToolbar(toolbar);
 
@@ -168,6 +162,7 @@ public class NoteDetailFragment extends Fragment {
             note.setTitle(titleView.getText().toString());
             note.setText(textView.getText().toString());
             note.setData (dataView.getText().toString());
+
             Activity activity = requireActivity();
             PopupMenu popupMenu = new PopupMenu(activity, view);
             activity.getMenuInflater().inflate(R.menu.popup_menu, popupMenu.getMenu());

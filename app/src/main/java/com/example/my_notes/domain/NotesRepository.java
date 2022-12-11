@@ -25,5 +25,4 @@ public interface NotesRepository {
     int checkGroupForDbGroup(String text);
 
     List<Group> searchByGroupName(String folderName);
-
 }

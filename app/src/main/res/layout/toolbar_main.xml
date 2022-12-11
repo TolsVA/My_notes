@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.appbar.AppBarLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/app_bar_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:theme="@style/Theme.My_Notes.NoActionBar"
-    app:layout_constraintBottom_toTopOf="@+id/scroll_list"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent">
+    android:theme="@style/Theme.My_Notes.NoActionBar">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar"
@@ -29,7 +26,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="✕"
+                android:text="@string/delete"
                 android:textSize="20sp" />
 
             <TextView
@@ -38,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:gravity="center"
-                android:text="Выберите обьекты"
+                android:text="@string/select_objects"
                 android:textSize="20sp" />
 
             <ImageView
@@ -48,7 +45,8 @@
                 android:layout_gravity="end"
                 android:layout_weight="1"
                 android:src="@drawable/ic_baseline_checklist_24"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                tools:ignore="ContentDescription" />
         </LinearLayout>
     </com.google.android.material.appbar.MaterialToolbar>
 

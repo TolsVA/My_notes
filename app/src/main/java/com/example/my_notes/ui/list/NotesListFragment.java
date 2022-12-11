@@ -1,39 +1,38 @@
 package com.example.my_notes.ui.list;
 
 import android.annotation.SuppressLint;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.appcompat.widget.SearchView;
+
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.view.GravityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import com.example.my_notes.GroupFragment;
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
+import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
+import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
@@ -41,7 +40,7 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotesListFragment extends Fragment {
+public class NotesListFragment extends Fragment{
 
 //    private final SimpleDateFormat formatDate = new SimpleDateFormat("E dd.BB.yyyy 'и время' hh:mm:ss a zzz", Locale.getDefault());
 
@@ -68,6 +67,18 @@ public class NotesListFragment extends Fragment {
     public static final String CREATE_DELETE_KEY = "NotesListFragment_CREATE_DELETE";
 
     public int index;
+
+    public Toolbar toolbar;
+
+    public LinearLayout layoutToolbar;
+
+    public FloatingActionButton fab;
+
+    public DrawerLayout drawer;
+
+    public BottomNavigationView bottomNavigationView;
+
+    public NavigationView navigationView;
 
     public TextView deleteCounter;
     public TextView counter;
@@ -99,7 +110,7 @@ public class NotesListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate ( R.layout.fragment_notes_list, container, false );
+        return inflater.inflate ( R.layout.app_bar_fragment_note_list, container, false );
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -107,92 +118,27 @@ public class NotesListFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated ( view, savedInstanceState );
 
-        NavigationView navigationView = view.findViewById ( R.id.nav_view );
+        navigationView = view.findViewById ( R.id.nav_view );//Шторка
 
-        BottomNavigationView bottomNavigationView = view.findViewById ( R.id.bottom_navigation );
-        bottomNavigationView.setVisibility ( View.GONE );
+        createNavView ( navigationView );
 
-        MenuItem menuItem = (MenuItem)bottomNavigationView.getMenu ().getItem ( 0 );
-        menuItem.setCheckable ( false );
-
-        bottomNavigationView.setOnItemSelectedListener ( new NavigationBarView.OnItemSelectedListener ( ) {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                item.setCheckable ( false );
-                switch (item.getItemId ( )) {
-                    case R.id.search:
-
-                    case R.id.move:
-                        Toast.makeText ( requireContext ( ), "Здесь что-то будет", Toast.LENGTH_SHORT ).show ( );
-                        return true;
-                    case R.id.delete_selected_notes:
-                        Bundle data = new Bundle ( );
-                        data.putParcelableArrayList ( ARG_DELETE_NOTE, (ArrayList<? extends Parcelable>) deleteNotes );
-
-                        getParentFragmentManager ( )
-                                .setFragmentResult ( DELETE_NOTE_KEY, data );
-                        return true;
-                }
-                return false;
-            }
-        } );
-
-        Toolbar toolbar = view.findViewById ( R.id.toolbar );
-        LinearLayout layoutToolbar = view.findViewById ( R.id.layout_toolbar );
-
-//        deleteCounter = view.findViewById ( R.id.delete_counter );
-//        deleteCounter.setOnClickListener ( new View.OnClickListener ( ) {
-//            @Override
-//            public void onClick(View view) {
-//                deleteNotes.clear ( );
-//                Bundle data = new Bundle ( );
-//                data.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
-//
-//                getParentFragmentManager ( )
-//                        .setFragmentResult ( ADD_DELETE_KEY, data );
-//            }
-//        } );
-//
-//        counter = view.findViewById ( R.id.counter );
-//        if (deleteNotes.size ( ) > 0) {
-//            counter.setText ( "Выбрано: " + deleteNotes.size ( ) );
-//        }
-//
-//        chooseAll = view.findViewById ( R.id.choose_all );
-//        chooseAll.setOnClickListener ( new View.OnClickListener ( ) {
-//            @Override
-//            public void onClick(View view) {
-//                if (deleteNotes.size ( ) == notes.size ( )) {
-//                    deleteNotes.clear ( );
-//                } else {
-//                    deleteNotes.clear ( );
-//                    deleteNotes.addAll ( notes );
-//                }
-//                Bundle data = new Bundle ( );
-//                data.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
-//
-//                getParentFragmentManager ( )
-//                        .setFragmentResult ( ADD_DELETE_KEY, data );
-//            }
-//        } );
-
+        drawer = view.findViewById ( R.id.drawer );
+        toolbar = view.findViewById ( R.id.toolbar );
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            if (deleteNotes.size ( ) > 0) {
-                bottomNavigationView.setVisibility ( View.VISIBLE );
-            }
+            supplyToolbar ( toolbar );
         }
 
-//        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-//            if (deleteNotes.size ( ) == 0) {
-//                ((MainActivity) requireActivity ( )).supplyToolbar ( toolbar );
-//            } else {
-//                toolbar.getMenu ( ).clear ( );
-//                layoutToolbar.setVisibility ( View.VISIBLE );
-//                bottomNavigationView.setVisibility ( View.VISIBLE );
-//            }
-//        } else {
-//            toolbar.setVisibility ( View.GONE );
-//        }
+        toolbarItemClick();
+
+        layoutToolbar = view.findViewById ( R.id.layout_toolbar );
+        deleteCounter = view.findViewById ( R.id.delete_counter );
+        counter = view.findViewById ( R.id.counter );
+        chooseAll = view.findViewById ( R.id.choose_all );
+
+        bottomNavigationView = view.findViewById ( R.id.bottom_navigation );//popup
+
+        fab = view.findViewById ( R.id.fab );
+        ((MainActivity) requireActivity ( )).fabEventHandling ( fab );
 
         notesContainer = view.findViewById ( R.id.container_notes );
 
@@ -207,8 +153,96 @@ public class NotesListFragment extends Fragment {
         }
     }
 
+    @SuppressLint("NonConstantResourceId")
+    private void toolbarItemClick() {
+        toolbar.setOnMenuItemClickListener ( item -> {
+            switch (item.getItemId ( )) {
+                case R.id.search:
+                    SearchView searchView = (SearchView) item.getActionView ( );
+                    searchView.setOnQueryTextListener ( new SearchView.OnQueryTextListener ( ) {
+                        @Override
+                        public boolean onQueryTextSubmit(String query) {
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onQueryTextChange(String newText) {
+                            notes = ((MainActivity)requireActivity ()).searchNote(newText);
+                            showNotes ( notes );
+                            return true;
+                        }
+                    } );
+                    return true;
+                case R.id.note_folders:
+                    Toast.makeText ( requireContext (), item.getTitle (), Toast.LENGTH_SHORT ).show ( );
+
+/*                presenter.clearDb ( );
+            notes = presenter.refreshNotes ( );
+            index = 0;
+            indexPrev = -1;
+
+            FragmentManager fm = getSupportFragmentManager ( );
+            fm.popBackStack ( );
+            fm.beginTransaction ( )
+                    .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                    .commit ( );
+            if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                showDetails ( );
+//                    savePosition ( );
+            }
+            recreate ();*/
+                    return true;
+                default:
+                    return false;
+            }
+        } );
+    }
+
+    private void createNavView(NavigationView navigationView) {
+        navigationView.setNavigationItemSelectedListener ( new NavigationView.OnNavigationItemSelectedListener ( ) {
+            @SuppressLint({"UseCompatLoadingForDrawables", "NonConstantResourceId"})
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                switch (item.getItemId ( )) {
+                    case R.id.add_folder:
+                        new MyDialogFragmentImageView ( ).show ( requireActivity ().getSupportFragmentManager ( ), MyDialogFragmentImageView.TAG );
+//                        drawer.closeDrawer ( GravityCompat.START );
+                        return true;
+                    case R.id.delete_folder:
+                        Toast.makeText ( requireContext (), "delete_folder", Toast.LENGTH_SHORT ).show ( );
+                        return true;
+                    case R.id.search_nav_list:
+                        Toast.makeText ( requireContext (), "search", Toast.LENGTH_SHORT ).show ( );
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        } );
+    }
+
     public void showNotes(List<Note> notes) {
         notesContainer.removeAllViews ( );
+
+        toolbar.setTitle ( ((MainActivity) requireActivity ( )).getGroupName ( ));
+
+        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            if (deleteNotes.size ( ) > 0) {
+                createBottomNavigation ( );
+                fab.setVisibility ( View.GONE );
+                bottomNavigationView.setVisibility ( View.VISIBLE );
+                toolbar.getMenu ( ).setGroupVisible ( R.id.search_note_folders, false );
+                layoutToolbar.setVisibility ( View.VISIBLE );
+                showLayoutToolbar ( );
+            } else {
+                fab.setVisibility ( View.VISIBLE );
+                bottomNavigationView.setVisibility ( View.GONE );
+                toolbar.getMenu ( ).setGroupVisible ( R.id.search_note_folders, true );
+                layoutToolbar.setVisibility ( View.GONE );
+                supplyToolbar ( toolbar );
+            }
+        }
+
         for (Note note : notes) {
 
             View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );
@@ -229,19 +263,20 @@ public class NotesListFragment extends Fragment {
                 }
             }
 
-//            SimpleDateFormat formatDate = null;
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-////                formatDate = new SimpleDateFormat("день недели:  EEEE\nдата________:   dd MMMM yyyy" +
-////                        "\nВремя______:   hh:mm", Locale.getDefault());
-//                formatDate = new SimpleDateFormat ( "EEEE  dd MMMM yyyy   hh:mm", Locale.getDefault ( ) );
-//            }
-//
-//            assert formatDate != null;
-//            StringBuilder sb = new StringBuilder(formatDate.format( Date.parse ( note.getData() )).toLowerCase());
-//            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-//            String data1 = sb.toString();
-//
-//            data.setText(data1);
+/*            SimpleDateFormat formatDate = null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//                formatDate = new SimpleDateFormat("день недели:  EEEE\n дата________:   dd MMMM yyyy" +
+//                        "\nВремя______:   hh:mm", Locale.getDefault());
+                formatDate = new SimpleDateFormat ( "EEEE  dd MMMM yyyy   hh:mm", Locale.getDefault ( ) );
+            }
+
+            assert formatDate != null;
+            StringBuilder sb = new StringBuilder(formatDate.format( Date.parse ( note.getData() )).toLowerCase());
+            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+            String data1 = sb.toString();
+
+            data.setText(data1);*/
+
             data.setText ( note.getData ( ) );
 
             notesContainer.addView ( itemView );
@@ -301,5 +336,110 @@ public class NotesListFragment extends Fragment {
                 } );
             }
         }
+    }
+
+    private void createBottomNavigation() {
+        MenuItem menuItem = bottomNavigationView.getMenu ( ).getItem ( 0 );
+        menuItem.setCheckable ( false );
+
+        bottomNavigationView.setOnItemSelectedListener ( new NavigationBarView.OnItemSelectedListener ( ) {
+            @SuppressLint("NonConstantResourceId")
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                item.setCheckable ( false );
+                switch (item.getItemId ( )) {
+                    case R.id.save:
+
+                    case R.id.move:
+                        Toast.makeText ( requireContext ( ), "Здесь что-то будет", Toast.LENGTH_SHORT ).show ( );
+                        return true;
+                    case R.id.delete_selected_notes:
+                        Bundle data = new Bundle ( );
+                        data.putParcelableArrayList ( ARG_DELETE_NOTE, (ArrayList<? extends Parcelable>) deleteNotes );
+
+                        getParentFragmentManager ( )
+                                .setFragmentResult ( DELETE_NOTE_KEY, data );
+                        return true;
+                }
+                return false;
+            }
+        } );
+    }
+
+    private void showLayoutToolbar() {
+        deleteCounter.setOnClickListener ( new View.OnClickListener ( ) {
+            @Override
+            public void onClick(View view) {
+                deleteNotes.clear ( );
+                showNotes ( notes );
+            }
+        } );
+
+        if (deleteNotes.size ( ) > 0) {
+            counter.setText ( "Выбрано: " + deleteNotes.size ( ) );
+        }
+
+        chooseAll.setOnClickListener ( new View.OnClickListener ( ) {
+            @Override
+            public void onClick(View view) {
+                if (deleteNotes.size ( ) == notes.size ( )) {
+                    deleteNotes.clear ( );
+                } else {
+                    deleteNotes.clear ( );
+                    deleteNotes.addAll ( notes );
+                }
+                showNotes ( notes );
+            }
+        } );
+    }
+
+    public void supplyToolbar(Toolbar toolbar) {
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle (
+                requireActivity ( ),
+                drawer,
+                toolbar,
+                R.string.nav_app_bar_navigate_up_description,
+                R.string.nav_app_bar_navigate_up_description
+        ) {
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened ( drawerView );
+                Menu menu = navigationView.getMenu ();
+                menu.removeGroup ( R.id.group );
+                fillMenu ( menu );
+            }
+        };
+        drawer.addDrawerListener ( toggle );
+        toggle.syncState ( );
+    }
+
+    public void fillMenu( Menu menu ) {
+        List<Group> groups = ((MainActivity) requireActivity ( )).getGroups ();
+        for (int i = 0; i < groups.size (); i++){
+            final int position = i;
+            menu.add ( R.id.group, i + 1, Menu.NONE, groups.get ( i ).getName () )
+                    .setCheckable ( true )
+                    .setIcon ( groups.get ( position ).getIcon ()  )
+                    .setActionView ( R.layout.counter_notes );
+            TextView textNameGroup = menu.getItem ( i + 1 ).getActionView ().findViewById ( R.id.value_counter_notes );
+            textNameGroup.setText (  String.valueOf ( groups.get ( position ).getCount () ) );
+            menu.getItem ( i + 1 ).setOnMenuItemClickListener ( new MenuItem.OnMenuItemClickListener ( ) {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    long group_id = groups.get ( position ).getId ();
+                    ((MainActivity) requireActivity ( )).setGroupId(group_id);
+                    notes = ((MainActivity) requireActivity ( )).getNotes();
+                    showNotes ( notes );
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
+                }
+            } );
+        }
+    }
+
+    public void showFillMenu() {
+        Menu menu = navigationView.getMenu ();
+        menu.removeGroup ( R.id.group );
+        fillMenu ( menu );
     }
 }

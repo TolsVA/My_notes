@@ -1,14 +1,10 @@
 package com.example.my_notes.ui.adapter;
 
-import android.annotation.SuppressLint;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
-import com.example.my_notes.R;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.detail.NoteDetailFragment;
 
@@ -23,16 +19,10 @@ public class MyAdapter extends FragmentStateAdapter {
         this.notes = notes;
     }
 
-    @SuppressLint("NewApi")
     @NonNull
     @Override
     public Fragment createFragment(int position) {
         Note note = notes.get(position);
-//        Fragment fragment = NoteDetailFragment.newInstance ( note );
-//        FragmentManager manager = fragment.getActivity ().getSupportFragmentManager ();
-//        manager.beginTransaction ()
-//                .addToBackStack ( "" )
-//                .commit ();
         return(NoteDetailFragment.newInstance ( note ));
     }
 

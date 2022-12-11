@@ -16,14 +16,20 @@
         <entry key="app/src/main/res/drawable/ic_my.xml" value="0.2125" />
         <entry key="app/src/main/res/drawable/layout_bg_2.xml" value="0.109" />
         <entry key="app/src/main/res/layout-land/activity_main.xml" value="0.18" />
+        <entry key="app/src/main/res/layout-land/app_bar_fragment_note_list.xml" value="0.15885416666666666" />
         <entry key="app/src/main/res/layout-land/app_bar_main.xml" value="0.17552083333333332" />
+        <entry key="app/src/main/res/layout-land/content_fragment_notes_list.xml" value="0.22135416666666666" />
         <entry key="app/src/main/res/layout-land/content_main.xml" value="0.22552083333333334" />
         <entry key="app/src/main/res/layout-land/icon_group.xml" value="0.22552083333333334" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/activity_note_detail.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/app_bar_fragment_note_list.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/layout/app_bar_main.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/content_fragment_notes_list.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/layout/content_main.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/counter_notes.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/fab.xml" value="0.23229166666666667" />
+        <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.1265625" />
         <entry key="app/src/main/res/layout/fragment_group.xml" value="0.23541666666666666" />
         <entry key="app/src/main/res/layout/fragment_icons.xml" value="0.23697916666666666" />
         <entry key="app/src/main/res/layout/fragment_note_detail.xml" value="0.25" />
@@ -35,13 +41,18 @@
         <entry key="app/src/main/res/layout/item_group.xml" value="0.25" />
         <entry key="app/src/main/res/layout/item_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/note_detail.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/notes_list.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/switch_item.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/toolbar_main.xml" value="0.2296875" />
         <entry key="app/src/main/res/layout/view_pager2.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="app/src/main/res/menu/main.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/menu_bottom.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/menu/menu_bottom_detail.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/menu/menu_bottom_list.xml" value="0.13854166666666667" />
         <entry key="app/src/main/res/menu/menu_detail.xml" value="0.23333333333333334" />
+        <entry key="app/src/main/res/menu/menu_fragment_list_drawer.xml" value="0.25" />
         <entry key="app/src/main/res/menu/menu_list.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/menu_null.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/popup_menu.xml" value="0.2296875" />

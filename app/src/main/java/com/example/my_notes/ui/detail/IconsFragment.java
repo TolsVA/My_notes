@@ -64,13 +64,18 @@ public class IconsFragment extends Fragment {
         iv.setMinimumWidth ( 150 );
         iv.setMinimumHeight ( 150 );
         iv.setColorFilter ( getResources ().getColor ( android.R.color.holo_red_dark, requireContext().getTheme()) );
-        iv.setOnClickListener ( new View.OnClickListener ( ) {
-            @Override
-            public void onClick(View view) {
-                Fragment fragment = getActivity ().getSupportFragmentManager ( )
-                            .findFragmentByTag ( MyDialogFragmentImageView.TAG );
-                ((MyDialogFragmentImageView) fragment).getImageView(icon);
-            }
-        } );
+//        iv.setOnClickListener ( new View.OnClickListener ( ) {
+//            @Override
+//            public void onClick(View view) {
+//                Fragment fragment = getActivity ().getSupportFragmentManager ( )
+//                            .findFragmentByTag ( MyDialogFragmentImageView.TAG );
+//                ((MyDialogFragmentImageView) fragment).getImageView(icon);
+//            }
+//        } );
+
+
+//        Fragment fragment = getActivity ().getSupportFragmentManager ( )
+//                .findFragmentByTag ( MyDialogFragmentImageView.TAG );
+//        ((MyDialogFragmentImageView) fragment).getImageView(icon);
     }
 }

@@ -33,10 +33,17 @@
     <string name="save_to_new_folder">Save to new folder</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="Uncategorized">Без категории</string>
+    <string name="uncategorized">Без категории</string>
     <string name="delete_selected_notes">Delete</string>
     <string name="move">Move</string>
     <string name="choose_an_icon">choose an icon</string>
     <string name="Enter_folder_name">Enter folder name</string>
     <string name="note_save">note save</string>
+    <string name="save_as">save as</string>
+    <string name="tools">Tools</string>
+    <string name="add_folder">add folder</string>
+    <string name="delete_folder">delete folder</string>
+    <string name="folder_notes">folder notes</string>
+    <string name="delete">✕</string>
+    <string name="select_objects">select objects</string>
 </resources>
