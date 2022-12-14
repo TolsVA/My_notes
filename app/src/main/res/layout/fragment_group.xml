@@ -1,25 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/frame_container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/side_nav_bar">
+    android:background="@drawable/side_nav_bar"
+    android:orientation="vertical">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:id="@+id/container_group"
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/group_icon_selected"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:context=".GroupFragment">
+        android:layout_margin="@dimen/margin_10"
+        android:background="?android:selectableItemBackground"
+        android:focusable="false"
+        android:hint="@string/select_objects"
+        android:textAlignment="textStart"
+        android:textColor="@color/black"
+        android:textSize="@dimen/text_size_date_2"
+        app:iconGravity="textStart"
+        app:iconTint="@color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="UnusedAttribute" />
 
-        <GridLayout
-            android:id="@+id/grid_container_group"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:columnCount="2" />
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/frame_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
-</androidx.core.widget.NestedScrollView>
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:id="@+id/container_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            tools:context=".GroupFragment">
+
+        </androidx.appcompat.widget.LinearLayoutCompat>
+    </androidx.core.widget.NestedScrollView>
+</LinearLayout>
 

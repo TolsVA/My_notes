@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../../../Library/Android/sdk/platforms/android-32/data/res/layout/simple_expandable_list_item_1.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1905" />
         <entry key="app/src/main/res/drawable/ic_baseline_add_24.xml" value="0.1595" />
         <entry key="app/src/main/res/drawable/ic_baseline_check_24.xml" value="0.1475" />
@@ -21,6 +22,7 @@
         <entry key="app/src/main/res/layout-land/content_fragment_notes_list.xml" value="0.22135416666666666" />
         <entry key="app/src/main/res/layout-land/content_main.xml" value="0.22552083333333334" />
         <entry key="app/src/main/res/layout-land/icon_group.xml" value="0.22552083333333334" />
+        <entry key="app/src/main/res/layout-land/notes_list.xml" value="0.2078125" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.21666666666666667" />
         <entry key="app/src/main/res/layout/activity_note_detail.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/app_bar_fragment_note_list.xml" value="0.23333333333333334" />
@@ -31,6 +33,7 @@
         <entry key="app/src/main/res/layout/fab.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.1265625" />
         <entry key="app/src/main/res/layout/fragment_group.xml" value="0.23541666666666666" />
+        <entry key="app/src/main/res/layout/fragment_group_name.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_icons.xml" value="0.23697916666666666" />
         <entry key="app/src/main/res/layout/fragment_note_detail.xml" value="0.25" />
         <entry key="app/src/main/res/layout/fragment_notes_list.xml" value="0.25" />
@@ -42,20 +45,24 @@
         <entry key="app/src/main/res/layout/item_note.xml" value="0.25" />
         <entry key="app/src/main/res/layout/nav_header_main.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/note_detail.xml" value="0.23072916666666668" />
+        <entry key="app/src/main/res/layout/note_detail_toolbar.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/notes_list.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/layout/switch_item.xml" value="0.23072916666666668" />
-        <entry key="app/src/main/res/layout/toolbar_main.xml" value="0.2296875" />
+        <entry key="app/src/main/res/layout/toolbar_main.xml" value="0.25" />
         <entry key="app/src/main/res/layout/view_pager2.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/activity_main_drawer.xml" value="0.33" />
         <entry key="app/src/main/res/menu/main.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/menu_bottom.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/menu_bottom_detail.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/menu_bottom_list.xml" value="0.13854166666666667" />
+        <entry key="app/src/main/res/menu/menu_contex_app_bar.xml" value="0.2296875" />
+        <entry key="app/src/main/res/menu/menu_context_detail.xml" value="0.23229166666666667" />
         <entry key="app/src/main/res/menu/menu_detail.xml" value="0.23333333333333334" />
         <entry key="app/src/main/res/menu/menu_fragment_list_drawer.xml" value="0.25" />
         <entry key="app/src/main/res/menu/menu_list.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/menu_null.xml" value="0.23072916666666668" />
         <entry key="app/src/main/res/menu/popup_menu.xml" value="0.2296875" />
+        <entry key="app/src/main/res/menu/popup_menu_detail.xml" value="0.22864583333333333" />
         <entry key="app/src/main/res/mipmap-anydpi-v26/ic_banner.xml" value="0.1905" />
       </map>
     </option>

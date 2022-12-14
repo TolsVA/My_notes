@@ -47,5 +47,10 @@
     <string name="delete_folder">Удалить папку</string>
     <string name="folder_notes">Папка заметок</string>
     <string name="delete">✕</string>
-    <string name="select_objects">Выберите обьекты</string>
+    <string name="select_objects">Выберите папку</string>
+    <string name="you_have_no_notes">У вас нет заметок</string>
+    <string name="create_new_folder">Создать новую  папку</string>
+
+    <string name="no_folders_to_save"><b><u>НЕТ ПАПОК ДЛЯ СОХРАНЕНИЯ</u></b></string>
+    <string name="save_new_folder">Создать папку</string>
 </resources>

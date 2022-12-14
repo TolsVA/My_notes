@@ -16,6 +16,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -166,9 +167,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
                     note = result.getParcelable ( NoteDetailFragment.ARG_NEW_NOTE );
 
-                    fab.setVisibility ( View.VISIBLE );
-                    fab.setClickable ( true );
-
                     if (note.getIndex ( ) != -1) {
                         presenter.upgradeNote ( note );
                         notes = presenter.refreshNotes ( group_id );
@@ -223,26 +221,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 } );
 
         getSupportFragmentManager ( )
-                .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_GROUP_FRAGMENT, this, (requestKey, result) -> {
-                    groups = presenter.refreshGroup ( );
-
-                    for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
-                        if (fragment instanceof NoteDetailFragment) {
-                            fm.beginTransaction ( )
-//                                    .addToBackStack ( "" )
-                                    .hide ( fragment )
-                                    .commit ( );
-                            break;
-                        }
-                    }
-
-                    fm.beginTransaction ( )
-                            .addToBackStack ( "" )
-                            .replace ( R.id.fragment_container, GroupFragment.newInstance ( groups ), GroupFragment.TAG )
-                            .commit ( );
-                } );
-
-        getSupportFragmentManager ( )
                 .setFragmentResultListener ( NotesListFragment.CREATE_DELETE_KEY, this, (requestKey, result) -> {
                     deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
 
@@ -275,15 +253,15 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         NestedScrollView scrollView = findViewById ( R.id.scroll_list );
         LinearLayoutCompat notesContainer = findViewById ( R.id.container_notes );
 
-        if (notes.size ( ) > 0) {
-            scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
-            notesContainer.getChildAt ( index ).setBackground ( getDrawable ( R.drawable.layout_bg_2 ) );
-        }
-
-        if (indexPrev >= 0 && index != indexPrev) {
-            notesContainer.getChildAt ( indexPrev )
-                    .setBackground ( getDrawable ( R.drawable.layout_bg ) );
-        }
+//        if (notes.size ( ) > 0) {
+//            scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
+//            notesContainer.getChildAt ( index ).setBackground ( getDrawable ( R.drawable.layout_bg_2 ) );
+//        }
+//
+//        if (indexPrev >= 0 && index != indexPrev) {
+//            notesContainer.getChildAt ( indexPrev )
+//                    .setBackground ( getDrawable ( R.drawable.layout_bg ) );
+//        }
     }
 
     private FragmentStateAdapter changeContent(List<Note> _notes) {
@@ -367,41 +345,48 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         return presenter.refreshGroup ( );
     }
 
-    public void fabEventHandling(FloatingActionButton fab) {
+    public void fabEventHandling(FloatingActionButton fab, CharSequence title) {
         this.fab = fab;
-        fab.setVisibility ( View.VISIBLE );
-        fab.setOnClickListener ( view -> {
-            fab.setVisibility ( View.GONE );
-            view.setClickable ( false );
-            view.setVisibility ( View.GONE );
+        fab.setOnClickListener ( new View.OnClickListener ( ) {
+            @Override
+            public void onClick(View view) {
+                fab.setVisibility ( View.GONE );
+                view.setClickable ( false );
+                view.setVisibility ( View.GONE );
 
-            String folderName = getString ( R.string.uncategorized );
-            if (presenter.checkGroupFor ( folderName ) == 0) {
-//                group = new Group ( -1, folderName, R.drawable.ic_baseline_folder_24 );
-                group = presenter.addGroup ( group );
-            } else {
-                groups = presenter.searchByGroupName ( folderName );
-                group = groups.get ( 0 );
+
+//                String folderName = MainActivity.this.getString ( R.string.uncategorized );
+//                if (presenter.checkGroupFor ( folderName ) == 0) {
+//                    group = new Group ( -1, folderName, R.drawable.ic_baseline_folder_24, 0 );
+//                    group = presenter.addGroup ( group );
+//                } else {
+//                    groups = presenter.searchByGroupName ( folderName );
+//                    group = groups.get ( 0 ); // Доработать
+//                }
+
+                newNote = new Note ( -1, "", "", String.valueOf ( new Date ( ) ), 0 );
+                if (MainActivity.this.getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                    pager.setAdapter ( MainActivity.this.changeContent ( Collections.singletonList ( newNote ) ) );
+                } else {
+                    Fragment fmList = MainActivity.this.getSupportFragmentManager ( )
+                            .findFragmentByTag ( NotesListFragment.TAG );
+
+                    FragmentManager fmDetail = MainActivity.this.getSupportFragmentManager ( );
+
+                    assert fmList != null;
+                    fmDetail.beginTransaction ( )
+                            .remove ( fmList )
+                            .addToBackStack ( "" )
+                            .add ( R.id.fragment_container, NoteDetailFragment.newInstance ( newNote ), NoteDetailFragment.TAG )
+                            .commit ( );
+                }
+                selectPosition ( );
             }
-
-            newNote = new Note ( -1, "", "", String.valueOf ( new Date ( ) ), group.getId ( ) );
-            if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                pager.setAdapter ( changeContent ( Collections.singletonList ( newNote ) ) );
-            } else {
-                Fragment fmList = getSupportFragmentManager ( )
-                        .findFragmentByTag ( NotesListFragment.TAG );
-
-                FragmentManager fmDetail = getSupportFragmentManager ( );
-
-                assert fmList != null;
-                fmDetail.beginTransaction ( )
-                        .remove ( fmList )
-                        .addToBackStack ( "" )
-                        .add ( R.id.fragment_container, NoteDetailFragment.newInstance ( newNote ), NoteDetailFragment.TAG )
-                        .commit ( );
-            }
-            selectPosition ( );
         } );
+    }
+
+    public long getGroupId() {
+        return group_id;
     }
 
     public void setGroupId(long group_id) {
@@ -421,13 +406,15 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 }
             }
         }
-        return "У вас нет заметок";
+        return getResources ().getString ( R.string.you_have_no_notes );
     }
 
     @Override
-    public void CreateNewGroup(int resourceId, String text) {
-        newGroup = new Group ( -1, text, resourceId, 0 );
+    public void createNewGroup(int resourceId, String text) {
+        newGroup = new Group ( -1, text, resourceId, 0);
         presenter.addGroup ( newGroup );
+        group_id = newGroup.getId ();
+
 
         for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
             if (fragment instanceof NotesListFragment) {
@@ -439,5 +426,23 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     public List<Note> searchNote(String newText) {
         return presenter.search ( newText );
+    }
+
+    public void removeAll() {
+        presenter.clearDb ( );
+            notes = presenter.refreshNotes ( 0 );
+            index = 0;
+            indexPrev = -1;
+
+            FragmentManager fm = getSupportFragmentManager ( );
+            fm.popBackStack ( );
+            fm.beginTransaction ( )
+                    .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                    .commit ( );
+            if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                showDetails ( );
+//                    savePosition ( );
+            }
+            recreate ();
     }
 }

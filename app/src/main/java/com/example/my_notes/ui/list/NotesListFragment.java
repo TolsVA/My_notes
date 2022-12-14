@@ -4,14 +4,19 @@ import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,11 +31,15 @@ import androidx.core.view.GravityCompat;
 import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
+import com.example.my_notes.ui.adapter.MyAdapterGroup;
+import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -49,6 +58,8 @@ public class NotesListFragment extends Fragment{
     public LinearLayoutCompat notesContainer;
 
     public List<Note> notes, deleteNotes;
+
+    public List<Group> groups;
 
     public static final String ARG_NOTES = "ARG_NOTES";
 
@@ -83,6 +94,8 @@ public class NotesListFragment extends Fragment{
     public TextView deleteCounter;
     public TextView counter;
     public ImageView chooseAll;
+
+    public ViewPager2 pager2;
 
     public NotesListFragment() {
     }
@@ -119,16 +132,9 @@ public class NotesListFragment extends Fragment{
         super.onViewCreated ( view, savedInstanceState );
 
         navigationView = view.findViewById ( R.id.nav_view );//Шторка
-
-        createNavView ( navigationView );
-
         drawer = view.findViewById ( R.id.drawer );
         toolbar = view.findViewById ( R.id.toolbar );
-        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            supplyToolbar ( toolbar );
-        }
-
-        toolbarItemClick();
+        fab = view.findViewById ( R.id.fab );
 
         layoutToolbar = view.findViewById ( R.id.layout_toolbar );
         deleteCounter = view.findViewById ( R.id.delete_counter );
@@ -137,20 +143,58 @@ public class NotesListFragment extends Fragment{
 
         bottomNavigationView = view.findViewById ( R.id.bottom_navigation );//popup
 
-        fab = view.findViewById ( R.id.fab );
-        ((MainActivity) requireActivity ( )).fabEventHandling ( fab );
-
         notesContainer = view.findViewById ( R.id.container_notes );
 
         showNotes ( notes );
+
+        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            supplyToolbar ( toolbar );
+            createNavView ( navigationView );
+            toolbarItemClick(); // Проверить
+
+//            pager2 = view.findViewById ( R.id.pager_group );
+//            groups = ((MainActivity) requireActivity ( )).getGroups ();
+//            pager2.setAdapter ( new MyAdapterGroup ( requireActivity (), groups ) );
+//            pager2.setPageTransformer ( new ZoomOutPageTransformer ( ) );
+//
+//            long groupId = ((MainActivity) requireActivity ( )).getGroupId();
+//            pager2.setCurrentItem ( (int) groupId, false );
+//            savePosition();
+            ((MainActivity) requireActivity ( )).fabEventHandling ( fab, toolbar.getTitle () );
+        }
+
 
         NestedScrollView scrollView = view.findViewById ( R.id.scroll_list );
 
         scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
 
-        if (notes.size ( ) != 0 && index >= 0) {
-            notesContainer.getChildAt ( index ).setBackground ( getResources ( ).getDrawable ( R.drawable.layout_bg_2, requireContext ( ).getTheme ( ) ) );
-        }
+//        if (notes.size ( ) != 0 && index >= 0) {
+//            notesContainer.getChildAt ( index ).setBackground ( getResources ( ).getDrawable ( R.drawable.layout_bg_2, requireContext ( ).getTheme ( ) ) );
+//        }
+    }
+
+    private void savePosition() {
+        this.pager2.registerOnPageChangeCallback ( new ViewPager2.OnPageChangeCallback ( ) {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                super.onPageScrolled ( position, positionOffset, positionOffsetPixels );
+            }
+
+            @SuppressLint("UseCompatLoadingForDrawables")
+            @Override
+            public void onPageSelected(int position) {
+                super.onPageSelected ( position );
+                long group_id = groups.get ( position ).getId ();
+                ((MainActivity) requireActivity ( )).setGroupId(group_id);
+                notes = ((MainActivity) requireActivity ( )).getNotes();
+                showNotes ( notes );
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+                super.onPageScrollStateChanged ( state );
+            }
+        } );
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -174,23 +218,7 @@ public class NotesListFragment extends Fragment{
                     } );
                     return true;
                 case R.id.note_folders:
-                    Toast.makeText ( requireContext (), item.getTitle (), Toast.LENGTH_SHORT ).show ( );
-
-/*                presenter.clearDb ( );
-            notes = presenter.refreshNotes ( );
-            index = 0;
-            indexPrev = -1;
-
-            FragmentManager fm = getSupportFragmentManager ( );
-            fm.popBackStack ( );
-            fm.beginTransaction ( )
-                    .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                    .commit ( );
-            if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                showDetails ( );
-//                    savePosition ( );
-            }
-            recreate ();*/
+                    ((MainActivity)requireActivity ()).removeAll();
                     return true;
                 default:
                     return false;
@@ -224,9 +252,10 @@ public class NotesListFragment extends Fragment{
     public void showNotes(List<Note> notes) {
         notesContainer.removeAllViews ( );
 
-        toolbar.setTitle ( ((MainActivity) requireActivity ( )).getGroupName ( ));
-
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
+            String nameGroup = ((MainActivity) requireActivity ( )).getGroupName ( );
+            toolbar.setTitle ( nameGroup );
+
             if (deleteNotes.size ( ) > 0) {
                 createBottomNavigation ( );
                 fab.setVisibility ( View.GONE );
@@ -241,10 +270,12 @@ public class NotesListFragment extends Fragment{
                 layoutToolbar.setVisibility ( View.GONE );
                 supplyToolbar ( toolbar );
             }
+        } else {
+            bottomNavigationView.setVisibility ( View.GONE );
         }
 
-        for (Note note : notes) {
 
+        for (Note note : notes) {
             View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );
 
             TextView title = itemView.findViewById ( R.id.note_title );
@@ -367,6 +398,7 @@ public class NotesListFragment extends Fragment{
     }
 
     private void showLayoutToolbar() {
+
         deleteCounter.setOnClickListener ( new View.OnClickListener ( ) {
             @Override
             public void onClick(View view) {

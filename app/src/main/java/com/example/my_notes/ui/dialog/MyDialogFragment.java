@@ -3,6 +3,7 @@ package com.example.my_notes.ui.dialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
+import android.widget.DatePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,9 +43,12 @@ public class MyDialogFragment extends DialogFragment {
         int mMonth = cal.get(Calendar.MONTH);
         int mDay = cal.get(Calendar.DAY_OF_MONTH);
         return new DatePickerDialog(requireActivity (),
-                (view, year, monthOfYear, dayOfMonth) -> {
-                    String textDateParam = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
-                    ((ClickDatePickerDialog) requireActivity ()).applySettings (textDateParam, id);
+                new DatePickerDialog.OnDateSetListener ( ) {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        String textDateParam = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
+                        ((ClickDatePickerDialog) MyDialogFragment.this.requireActivity ( )).applySettings ( textDateParam, id );
+                    }
                 }, mYear, mMonth, mDay);
     }
 }

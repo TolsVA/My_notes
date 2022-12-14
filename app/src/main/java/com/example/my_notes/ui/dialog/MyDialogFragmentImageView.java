@@ -33,7 +33,7 @@ public class MyDialogFragmentImageView extends DialogFragment {
     public int resourceId;
 
     public interface CreateNewGroup {
-        void CreateNewGroup(int resourceId, String text);
+        void createNewGroup(int resourceId, String text);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class MyDialogFragmentImageView extends DialogFragment {
                 .setPositiveButton("Создать папку", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ((CreateNewGroup) requireActivity ()).CreateNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
+                        ((CreateNewGroup) requireActivity ()).createNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
                     }
                 })
 //                .setNegativeButton("No", new DialogInterface.OnClickListener() {

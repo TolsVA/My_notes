@@ -42,25 +42,13 @@
         android:hint="@string/text"
         android:inputType="text"
         android:textSize="@dimen/text_size_date_3"
-        app:layout_constraintBottom_toTopOf="@id/button_save"
+        app:layout_constraintBottom_toTopOf="@id/bottom_navigation_detail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/data_detail" />
 
-    <Button
-        android:id="@+id/button_save"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/save"
-        android:textSize="@dimen/text_size_date_3"
-        app:layout_constraintBottom_toBottomOf="@id/bottom_navigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_detail" />
-
     <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+        android:id="@+id/bottom_navigation_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
@@ -70,5 +58,5 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/button_save" />
+        app:layout_constraintTop_toBottomOf="@+id/text_detail" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,6 +14,12 @@
         app:popupTheme="@style/Theme.Nav_drawer.PopupOverlay"
         app:title="@string/app_name">
 
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/pager_group"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
         <LinearLayout
             android:id="@+id/layout_toolbar"
             android:layout_width="match_parent"
