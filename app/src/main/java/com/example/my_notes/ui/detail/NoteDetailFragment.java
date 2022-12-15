@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SearchView;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
@@ -36,10 +38,12 @@ import com.example.my_notes.ui.adapter.MyAdapterGroup;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
 import com.example.my_notes.ui.dialog.MyDialogFragmentGroup;
+import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -94,10 +98,6 @@ public class NoteDetailFragment extends Fragment {
             note = getArguments ( ).getParcelable ( ARG_NOTE );
         }
 //        setHasOptionsMenu ( true );
-
-//        ActionBar actionBar = getSupportActionBar();
-//        assert actionBar != null;
-//        actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
     @Override
@@ -131,8 +131,6 @@ public class NoteDetailFragment extends Fragment {
         textView = view.findViewById ( R.id.text_detail );
 
         dataView = view.findViewById ( R.id.data_detail );
-
-//        btnSave = view.findViewById ( R.id.button_save );
 
         displayDetails ( note );
 
@@ -274,26 +272,21 @@ public class NoteDetailFragment extends Fragment {
                                             int iconResourceId = R.drawable.ic_baseline_folder_24;
                                             String name = getString ( R.string.uncategorized );
 
-                                            ((MainActivity) requireActivity ( )).createNewGroup ( iconResourceId, name );
+                                            groupId = ((MainActivity) requireActivity ( )).createNewGroup ( iconResourceId, name );
 
-                                            toolbar.setTitle ( name );
-                                            groupId = ((MainActivity) requireActivity ( )).getGroupId ( );
+//                                            toolbar.setTitle ( name );
+//                                            groupId = ((MainActivity) requireActivity ( )).getGroupId ( );
                                             note.setGroup_id ( groupId );
 
-                                            Bundle data = new Bundle ( );
-                                            data.putParcelable ( ARG_NEW_NOTE, note );
-                                            getParentFragmentManager ( )
-                                                    .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
+//                                            Bundle data = new Bundle ( );
+//                                            data.putParcelable ( ARG_NEW_NOTE, note );
+//                                            getParentFragmentManager ( )
+//                                                    .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
+                                            ((MainActivity) requireActivity ( )).showNotesListFragment ( note );
                                             return true;
                                         case R.id.create_new_folder:
-                                            Toast.makeText ( activity, item.getTitle ( ), Toast.LENGTH_SHORT ).show ( );
-////                            Bundle data1 = new Bundle();
-////                            data1.putParcelable(ARG_NEW_GROUP, note);
-////                            getParentFragmentManager()
-////                                    .setFragmentResult(RESULT_KEY_GROUP_FRAGMENT, data1);
-//                                        List<Group> groups = ((MainActivity) getActivity ( )).getGroups ( );
-//                                        MyDialogFragmentGroup fragment = MyDialogFragmentGroup.newInstance ( groups );
-//                                        fragment.show ( getChildFragmentManager ( ), MyDialogFragmentGroup.TAG );
+                                            MyDialogFragmentImageView fragment = MyDialogFragmentImageView.newInstance ( note );
+                                            fragment.show ( getChildFragmentManager ( ), MyDialogFragmentImageView.TAG );
                                             return true;
                                         default:
                                             return false;
@@ -305,33 +298,26 @@ public class NoteDetailFragment extends Fragment {
                             groupId = ((MainActivity) requireActivity ( )).getGroupId ( );
                             note.setGroup_id ( groupId );
 
-                            Bundle data = new Bundle ( );
-                            data.putParcelable ( ARG_NEW_NOTE, note );
-                            getParentFragmentManager ( )
-                                    .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
+//                            Bundle data = new Bundle ( );
+//                            data.putParcelable ( ARG_NEW_NOTE, note );
+//                            getParentFragmentManager ( )
+//                                    .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
+                            ((MainActivity) requireActivity ( )).showNotesListFragment ( note );
                         }
                         return true;
                     case R.id.save_as:
                         List<Group> groups = ((MainActivity) getActivity ( )).getGroups ( );
-                        MyDialogFragmentGroup fragment = MyDialogFragmentGroup.newInstance ( groups );
+                        MyDialogFragmentGroup fragment = MyDialogFragmentGroup.newInstance ( groups, note );
                         fragment.show ( getChildFragmentManager ( ), MyDialogFragmentGroup.TAG );
 
                         return true;
                     case R.id.save_new_folder:
-                        Toast.makeText ( requireContext ( ), "Сохранить в новую папку", Toast.LENGTH_SHORT ).show ( );
+                        MyDialogFragmentImageView f = MyDialogFragmentImageView.newInstance ( note );
+                        f.show ( getChildFragmentManager ( ), MyDialogFragmentImageView.TAG );
                         return true;
                 }
                 return false;
             }
         } );
-    }
-
-    public void setNameGroup(long groupId) {
-        note.setGroup_id ( groupId );
-
-        Bundle data = new Bundle ( );
-        data.putParcelable ( ARG_NEW_NOTE, note );
-        getParentFragmentManager ( )
-                .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
     }
 }

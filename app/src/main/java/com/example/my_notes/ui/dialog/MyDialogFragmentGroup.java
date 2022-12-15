@@ -3,6 +3,7 @@ package com.example.my_notes.ui.dialog;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -47,15 +48,18 @@ public class MyDialogFragmentGroup extends DialogFragment {
     public static final String TAG = "MyDialogFragmentGroup";
 
     public static final String ARG_GROUP = "ARG_GROUP";
+    public static final String ARG_NOTE = "ARG_NOTE";
 
+    public Note note;
     public List<Group> groups;
     public long groupId;
     public String nameGroup;
 
-    public static MyDialogFragmentGroup newInstance(List<Group> groups) {
+    public static MyDialogFragmentGroup newInstance(List<Group> groups, Note note) {
         MyDialogFragmentGroup fragment = new MyDialogFragmentGroup ( );
         Bundle args = new Bundle ( );
         args.putParcelableArrayList ( ARG_GROUP, (ArrayList<? extends Parcelable>) groups );
+        args.putParcelable ( ARG_NOTE, note );
         fragment.setArguments ( args );
         return fragment;
     }
@@ -65,6 +69,7 @@ public class MyDialogFragmentGroup extends DialogFragment {
         super.onCreate ( savedInstanceState );
         if (getArguments ( ) != null) {
             groups = getArguments ( ).getParcelableArrayList ( ARG_GROUP );
+            note = getArguments ().getParcelable ( ARG_NOTE );
         }
     }
 
@@ -83,6 +88,7 @@ public class MyDialogFragmentGroup extends DialogFragment {
 
             MaterialButton buttonGroupName = view.findViewById ( R.id.group_icon );
             buttonGroupName.setIconResource ( resourceId );
+//            buttonGroupName.setIconTint ( ColorStateList.valueOf ( getResources ().getColor ( R.color.purple_700,getActivity ().getTheme () ) ) );
             buttonGroupName.setText ( groups.get ( i ).getName () );
             final int position = i;
             groupContainer.addView ( view );
@@ -93,33 +99,20 @@ public class MyDialogFragmentGroup extends DialogFragment {
                     groupId = groups.get ( position ).getId ();
                     nameGroup = groups.get ( position ).getName ();
                     materialButton.setIconResource ( resourceId );
-                    materialButton.setText ( groups.get ( position ).getName ()  );
+//                    materialButton.setIconTint ( ColorStateList.valueOf ( getResources ().getColor ( R.color.purple_700,getActivity ().getTheme () ) ) );
+                    materialButton.setText ( nameGroup  );
+                    note.setGroup_id ( groupId );
                 }
             } );
         }
 
         return new AlertDialog.Builder(requireContext ())
-                .setTitle ( "Выбери папку или создай новую" )
+//                .setTitle ( "Выбери папку для сохранения заметки" )
                 .setView(customView)
                 .setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-//                        new MyDialogFragmentImageView ( ).show ( requireActivity ().getSupportFragmentManager ( ), MyDialogFragmentImageView.TAG );
-                        ((MainActivity)getActivity ()).setGroupId ( groupId );
-                        List<Note> notes = ((MainActivity)getActivity ()).getNotes ();
-                        for (Fragment fragment : getActivity ().getSupportFragmentManager ().getFragments ()) {
-                            if (fragment instanceof NotesListFragment) {
-                                ((NotesListFragment) fragment).showNotes ( notes );
-                                break;
-                            }
-                        }
-                        for (Fragment fragment : getActivity ().getSupportFragmentManager ().getFragments ()) {
-                            if (fragment instanceof NoteDetailFragment) {
-//                                ((NoteDetailFragment) fragment).toolbar.setTitle ( nameGroup );
-                                ((NoteDetailFragment) fragment).setNameGroup(groupId);
-                                break;
-                            }
-                        }
+                        ((MainActivity) getActivity ()).showNotesListFragment ( note );
                     }
                 })
                 .create();

@@ -62,8 +62,8 @@
             android:layout_height="wrap_content"
             android:clickable="false"
             android:focusable="false"
-            android:buttonTint="@android:color/holo_orange_dark"
             android:layout_gravity="center|end"
+            android:buttonTint="@android:color/holo_orange_dark"
             android:visibility="gone"
             tools:visibility="visible"/>
 

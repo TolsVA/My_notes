@@ -5,10 +5,10 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,13 +18,19 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
+import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapterIcon;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
-import com.example.my_notes.ui.list.NotesListFragment;
+
+import java.util.ArrayList;
 
 public class MyDialogFragmentImageView extends DialogFragment {
 
     public static final String TAG = "MyDialogFragmentImageView";
+
+    public static final String ARG_NOTE = "ARG_NOTE";
+
+    public Note note;
 
     public ViewPager2 pager2;
     public ImageView imageView;
@@ -32,8 +38,26 @@ public class MyDialogFragmentImageView extends DialogFragment {
 
     public int resourceId;
 
+    public long groupId;
+
+    public static MyDialogFragmentImageView newInstance(Note note) {
+        MyDialogFragmentImageView fragment = new MyDialogFragmentImageView ( );
+        Bundle args = new Bundle ( );
+        args.putParcelable ( ARG_NOTE, note );
+        fragment.setArguments ( args );
+        return fragment;
+    }
+
     public interface CreateNewGroup {
-        void createNewGroup(int resourceId, String text);
+        long createNewGroup(int resourceId, String text);
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate ( savedInstanceState );
+        if (getArguments ( ) != null) {
+            note = getArguments ().getParcelable ( ARG_NOTE );
+        }
     }
 
     @Override
@@ -81,7 +105,9 @@ public class MyDialogFragmentImageView extends DialogFragment {
                 .setPositiveButton("Создать папку", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        ((CreateNewGroup) requireActivity ()).createNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
+                        groupId = ((CreateNewGroup) requireActivity ()).createNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
+                        note.setGroup_id ( groupId );
+                        ((MainActivity) getActivity ()).showNotesListFragment ( note );
                     }
                 })
 //                .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -115,10 +141,4 @@ public class MyDialogFragmentImageView extends DialogFragment {
             }
         } );
     }
-
-//    public void getImageView(int resourceId) {
-//        this.resourceId = resourceId;
-//        imageView.setImageResource ( resourceId );
-//        imageView.setColorFilter ( getResources ().getColor ( R.color.purple_700, requireContext().getTheme()) );
-//    }
 }

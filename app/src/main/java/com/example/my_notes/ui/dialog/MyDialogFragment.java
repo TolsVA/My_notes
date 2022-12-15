@@ -9,7 +9,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.my_notes.domain.Note;
+
 import java.util.Calendar;
+import java.util.List;
 
 public class MyDialogFragment extends DialogFragment {
 

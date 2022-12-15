@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +49,7 @@ import com.google.android.material.navigation.NavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class NotesListFragment extends Fragment{
 
@@ -110,6 +112,32 @@ public class NotesListFragment extends Fragment{
         return fragment;
     }
 
+
+    @Override
+    public void onCreateContextMenu(@NonNull ContextMenu menu, @NonNull View v, @Nullable ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu ( menu, v, menuInfo );
+        MenuInflater inflater = getActivity ().getMenuInflater();
+        inflater.inflate(R.menu.context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.add_folder:
+                Toast.makeText ( requireContext (), item.getTitle (), Toast.LENGTH_SHORT ).show ( );
+//                editNote(info.id);
+                return true;
+            case R.id.delete_folder:
+//                deleteNote(info.id);
+                int i = 0;
+                Toast.makeText ( requireContext (), item.getTitle (), Toast.LENGTH_SHORT ).show ( );
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate ( savedInstanceState );
@@ -118,6 +146,7 @@ public class NotesListFragment extends Fragment{
             index = getArguments ( ).getInt ( ARG_INDEX );
             deleteNotes = getArguments ( ).getParcelableArrayList ( ADD_DELETE_KEY );
         }
+        setHasOptionsMenu ( true );
     }
 
     @Override
@@ -145,8 +174,6 @@ public class NotesListFragment extends Fragment{
 
         notesContainer = view.findViewById ( R.id.container_notes );
 
-        showNotes ( notes );
-
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
             supplyToolbar ( toolbar );
             createNavView ( navigationView );
@@ -159,10 +186,13 @@ public class NotesListFragment extends Fragment{
 //
 //            long groupId = ((MainActivity) requireActivity ( )).getGroupId();
 //            pager2.setCurrentItem ( (int) groupId, false );
-//            savePosition();
+
+//            savePosition ( );
+
             ((MainActivity) requireActivity ( )).fabEventHandling ( fab, toolbar.getTitle () );
         }
 
+        showNotes ( notes );
 
         NestedScrollView scrollView = view.findViewById ( R.id.scroll_list );
 
@@ -173,29 +203,30 @@ public class NotesListFragment extends Fragment{
 //        }
     }
 
-    private void savePosition() {
-        this.pager2.registerOnPageChangeCallback ( new ViewPager2.OnPageChangeCallback ( ) {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                super.onPageScrolled ( position, positionOffset, positionOffsetPixels );
-            }
-
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected ( position );
-                long group_id = groups.get ( position ).getId ();
-                ((MainActivity) requireActivity ( )).setGroupId(group_id);
-                notes = ((MainActivity) requireActivity ( )).getNotes();
-                showNotes ( notes );
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                super.onPageScrollStateChanged ( state );
-            }
-        } );
-    }
+//    private void savePosition() {
+//        this.pager2.registerOnPageChangeCallback ( new ViewPager2.OnPageChangeCallback ( ) {
+//            @Override
+//            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+//                super.onPageScrolled ( position, positionOffset, positionOffsetPixels );
+//            }
+//
+//            @SuppressLint("UseCompatLoadingForDrawables")
+//            @Override
+//            public void onPageSelected(int position) {
+//                super.onPageSelected ( position );
+//                groups = ((MainActivity) requireActivity ( )).getGroups ();
+//                long group_id = groups.get ( position ).getId ();
+//                ((MainActivity) requireActivity ( )).setGroupId(group_id);
+//                notes = ((MainActivity) requireActivity ( )).getNotes();
+//                showNotes ( notes );
+//            }
+//
+//            @Override
+//            public void onPageScrollStateChanged(int state) {
+//                super.onPageScrollStateChanged ( state );
+//            }
+//        } );
+//    }
 
     @SuppressLint("NonConstantResourceId")
     private void toolbarItemClick() {
@@ -253,8 +284,9 @@ public class NotesListFragment extends Fragment{
         notesContainer.removeAllViews ( );
 
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            String nameGroup = ((MainActivity) requireActivity ( )).getGroupName ( );
-            toolbar.setTitle ( nameGroup );
+
+            String groupName = ((MainActivity) getActivity ( )).getGroupName ();
+            toolbar.setTitle ( groupName );
 
             if (deleteNotes.size ( ) > 0) {
                 createBottomNavigation ( );
@@ -277,6 +309,8 @@ public class NotesListFragment extends Fragment{
 
         for (Note note : notes) {
             View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );
+
+//            registerForContextMenu ( itemView );//context_menu
 
             TextView title = itemView.findViewById ( R.id.note_title );
             title.setText ( note.getTitle ( ) );

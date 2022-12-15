@@ -7,6 +7,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultOwner;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -16,7 +17,6 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.accessibility.AccessibilityManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -166,58 +166,7 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         getSupportFragmentManager ( )
                 .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
                     note = result.getParcelable ( NoteDetailFragment.ARG_NEW_NOTE );
-
-                    if (note.getIndex ( ) != -1) {
-                        presenter.upgradeNote ( note );
-                        notes = presenter.refreshNotes ( group_id );
-                    } else {
-                        presenter.addNote ( note );
-                        notes = presenter.refreshNotes ( group_id );
-                        indexPrev = index;
-                        index = 0;
-                        note = notes.get ( index );
-                    }
-
-                    if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        if (notes.size ( ) > 1) {
-                            showDetails ( );
-                        }
-                    } else {
-                        Fragment f = getSupportFragmentManager ( )
-                                .findFragmentByTag ( NoteDetailFragment.TAG );
-
-                        if (f != null) {
-                            getSupportFragmentManager ( )
-                                    .beginTransaction ( )
-                                    .remove ( f )
-                                    .commit ( );
-                        }
-
-                        if (coordinatorLayout != null) {
-                            coordinatorLayout.removeView ( itemView );
-                        }
-                    }
-
-                    //Перерисовать фрагмент способ 1
-                    fm.popBackStack ( );
-                    fm.beginTransaction ( )
-                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                            .commit ( );
-
-/*                     Перерисовать фрагмент способ 2 найти фрагмент по TAG
-                    Fragment fmList = getSupportFragmentManager ( )
-                            .findFragmentByTag ( NotesListFragment.TAG );
-                    fm.popBackStack ();
-                    assert fmList != null;
-                    ((NotesListFragment)fmList).showNotes(notes);
-
-                    //Перерисовать фрагмент способ 3 найти фрагмент пройдя по стеку фрагментов this.getSupportFragmentManager ().getFragments ()
-                    for (Fragment fragment : this.getSupportFragmentManager ().getFragments ()) {
-                        if (fragment instanceof NotesListFragment) {
-                            ((NotesListFragment) fragment).showNotes ( notes );
-                            break;
-                        }
-                    }*/
+                    showNotesList ( note );
                 } );
 
         getSupportFragmentManager ( )
@@ -244,6 +193,61 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
                 } );
+    }
+
+    private void showNotesList(Note note) {
+        if (note.getIndex ( ) != -1) {
+            presenter.upgradeNote ( note );
+            notes = presenter.refreshNotes ( group_id );
+        } else {
+            presenter.addNote ( note );
+            notes = presenter.refreshNotes ( group_id );
+            indexPrev = index;
+            index = 0;
+            note = notes.get ( index );
+        }
+
+        if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (notes.size ( ) > 1) {
+                showDetails ( );
+            }
+        } else {
+            Fragment f = getSupportFragmentManager ( )
+                    .findFragmentByTag ( NoteDetailFragment.TAG );
+
+            if (f != null) {
+                getSupportFragmentManager ( )
+                        .beginTransaction ( )
+                        .remove ( f )
+                        .commit ( );
+            }
+
+//                        if (coordinatorLayout != null) {
+//                            coordinatorLayout.removeView ( itemView );
+//                        }
+        }
+
+        //Перерисовать фрагмент способ 1
+        FragmentManager fm = getSupportFragmentManager ( );
+        fm.popBackStack ( );
+        fm.beginTransaction ( )
+                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                .commit ( );
+
+/*                     Перерисовать фрагмент способ 2 найти фрагмент по TAG
+                    Fragment fmList = getSupportFragmentManager ( )
+                            .findFragmentByTag ( NotesListFragment.TAG );
+                    fm.popBackStack ();
+                    assert fmList != null;
+                    ((NotesListFragment)fmList).showNotes(notes);
+
+                    //Перерисовать фрагмент способ 3 найти фрагмент пройдя по стеку фрагментов this.getSupportFragmentManager ().getFragments ()
+                    for (Fragment fragment : this.getSupportFragmentManager ().getFragments ()) {
+                        if (fragment instanceof NotesListFragment) {
+                            ((NotesListFragment) fragment).showNotes ( notes );
+                            break;
+                        }
+                    }*/
     }
 
 
@@ -410,18 +414,19 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     }
 
     @Override
-    public void createNewGroup(int resourceId, String text) {
+    public long createNewGroup(int resourceId, String text) {
         newGroup = new Group ( -1, text, resourceId, 0);
         presenter.addGroup ( newGroup );
         group_id = newGroup.getId ();
 
 
-        for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
-            if (fragment instanceof NotesListFragment) {
-                ((NotesListFragment) fragment).showFillMenu (  );
-                break;
-            }
-        }
+//        for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
+//            if (fragment instanceof NotesListFragment) {
+//                ((NotesListFragment) fragment).showFillMenu (  );
+//                break;
+//            }
+//        }
+        return group_id;
     }
 
     public List<Note> searchNote(String newText) {
@@ -444,5 +449,22 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 //                    savePosition ( );
             }
             recreate ();
+    }
+
+    public void showNotesListFragment(Note note) {
+        this.group_id = note.getGroup_id ();
+        presenter.addNote ( note );
+        notes = presenter.refreshNotes ( group_id );
+
+//        indexPrev = index;
+//        index = 0;
+//        note = notes.get ( index );
+
+//        FragmentManager fm = getSupportFragmentManager ( );
+//        fm.popBackStack ( );
+//        fm.beginTransaction ( )
+//                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+//                .commit ( );
+        showNotesList ( note );
     }
 }
