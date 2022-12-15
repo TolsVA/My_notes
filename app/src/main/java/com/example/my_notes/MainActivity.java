@@ -222,9 +222,9 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                         .commit ( );
             }
 
-//                        if (coordinatorLayout != null) {
-//                            coordinatorLayout.removeView ( itemView );
-//                        }
+            if (coordinatorLayout != null) {
+                coordinatorLayout.removeView ( itemView );
+            }
         }
 
         //Перерисовать фрагмент способ 1
@@ -410,14 +410,14 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                 }
             }
         }
-        return getResources ().getString ( R.string.you_have_no_notes );
+        return getResources ( ).getString ( R.string.you_have_no_notes );
     }
 
     @Override
     public long createNewGroup(int resourceId, String text) {
-        newGroup = new Group ( -1, text, resourceId, 0);
+        newGroup = new Group ( -1, text, resourceId, 0 );
         presenter.addGroup ( newGroup );
-        group_id = newGroup.getId ();
+        group_id = newGroup.getId ( );
 
 
 //        for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
@@ -435,36 +435,24 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     public void removeAll() {
         presenter.clearDb ( );
-            notes = presenter.refreshNotes ( 0 );
-            index = 0;
-            indexPrev = -1;
+        notes = presenter.refreshNotes ( 0 );
+        index = 0;
+        indexPrev = -1;
 
-            FragmentManager fm = getSupportFragmentManager ( );
-            fm.popBackStack ( );
-            fm.beginTransaction ( )
-                    .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                    .commit ( );
-            if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                showDetails ( );
+        FragmentManager fm = getSupportFragmentManager ( );
+        fm.popBackStack ( );
+        fm.beginTransaction ( )
+                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                .commit ( );
+        if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            showDetails ( );
 //                    savePosition ( );
-            }
-            recreate ();
+        }
+        recreate ( );
     }
 
     public void showNotesListFragment(Note note) {
-        this.group_id = note.getGroup_id ();
-        presenter.addNote ( note );
-        notes = presenter.refreshNotes ( group_id );
-
-//        indexPrev = index;
-//        index = 0;
-//        note = notes.get ( index );
-
-//        FragmentManager fm = getSupportFragmentManager ( );
-//        fm.popBackStack ( );
-//        fm.beginTransaction ( )
-//                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-//                .commit ( );
+        this.group_id = note.getGroup_id ( );
         showNotesList ( note );
     }
 }
