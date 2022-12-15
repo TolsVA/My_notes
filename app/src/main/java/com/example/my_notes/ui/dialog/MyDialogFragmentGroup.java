@@ -7,6 +7,7 @@ import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +82,8 @@ public class MyDialogFragmentGroup extends DialogFragment {
 
         View customView = getLayoutInflater().inflate( R.layout.fragment_group, null);
         MaterialButton materialButton = customView.findViewById ( R.id.group_icon_selected );
+        MaterialButton ok = customView.findViewById ( R.id.ok );
+
         LinearLayoutCompat groupContainer = customView.findViewById ( R.id.container_group );
         for (int i = 0; i < groups.size (); i++) {
             final int resourceId = groups.get ( i ).getIcon ();
@@ -106,16 +109,21 @@ public class MyDialogFragmentGroup extends DialogFragment {
             } );
         }
 
-        return new AlertDialog.Builder(requireContext ())
-//                .setTitle ( "Выбери папку для сохранения заметки" )
+        AlertDialog builder = new AlertDialog.Builder(requireContext ())
                 .setView(customView)
-                .setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        ((MainActivity) getActivity ()).showNotesListFragment ( note );
-                    }
-                })
                 .create();
-    }
 
+        ok.setOnClickListener ( new View.OnClickListener ( ) {
+            @Override
+            public void onClick(View view) {
+                if (note.getGroup_id () == 0) {
+                    Toast.makeText ( requireContext (), "Не выбрана папка для сохранения", Toast.LENGTH_SHORT ).show ( );
+                } else {
+                    ((MainActivity) getActivity ()).showNotesListFragment ( note );
+                    builder.dismiss ( );
+                }
+            }
+        } );
+        return builder;
+    }
 }
