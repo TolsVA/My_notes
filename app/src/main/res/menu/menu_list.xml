@@ -10,9 +10,9 @@
             app:showAsAction="ifRoom|collapseActionView">
         </item>
         <item
-            android:id="@+id/note_folders"
-            android:title="@string/note_folders"
-            android:icon="@drawable/ic_baseline_folder_copy_24"
+            android:id="@+id/delete_everything"
+            android:title="@string/delete_everything"
+            android:icon="@drawable/ic_baseline_delete_outline_24"
             app:showAsAction="ifRoom">
         </item>
     </group>

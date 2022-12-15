@@ -163,6 +163,7 @@ public class NotesListFragment extends Fragment{
         navigationView = view.findViewById ( R.id.nav_view );//Шторка
         drawer = view.findViewById ( R.id.drawer );
         toolbar = view.findViewById ( R.id.toolbar );
+        toolbar.getMenu ().getItem (  1  ).getIcon ().setTint ( getResources ().getColor ( R.color.purple_700, requireContext ().getTheme ()  ) );
         fab = view.findViewById ( R.id.fab );
 
         layoutToolbar = view.findViewById ( R.id.layout_toolbar );
@@ -248,7 +249,7 @@ public class NotesListFragment extends Fragment{
                         }
                     } );
                     return true;
-                case R.id.note_folders:
+                case R.id.delete_everything:
                     ((MainActivity)requireActivity ()).removeAll();
                     return true;
                 default:

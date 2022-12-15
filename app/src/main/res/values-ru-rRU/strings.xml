@@ -53,4 +53,5 @@
 
     <string name="no_folders_to_save"><b><u>НЕТ ПАПОК ДЛЯ СОХРАНЕНИЯ</u></b></string>
     <string name="save_new_folder">Создать папку</string>
+    <string name="delete_everything">delete everything</string>
 </resources>
