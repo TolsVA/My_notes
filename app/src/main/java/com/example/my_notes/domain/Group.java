@@ -11,7 +11,7 @@ public class Group implements Parcelable {
 
     private int icon;
 
-    private int count;
+    private final int count;
 
     public Group(long id, String name, int icon, int count) {
         this.id = id;
@@ -78,9 +78,5 @@ public class Group implements Parcelable {
 
     public int getCount() {
         return count;
-    }
-
-    public void setCount(int count) {
-        this.count = count;
     }
 }

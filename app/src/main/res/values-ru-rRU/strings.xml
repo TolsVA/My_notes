@@ -54,4 +54,10 @@
     <string name="no_folders_to_save"><b><u>НЕТ ПАПОК ДЛЯ СОХРАНЕНИЯ</u></b></string>
     <string name="save_new_folder">Создать папку</string>
     <string name="delete_everything">delete everything</string>
+
+    <string name="first_item">Первый пункт</string>
+    <string name="second_item">Второй пункт</string>
+    <string name="third_item">Третий пункт</string>
+    <string name="delete_folder_2">Удалить папку:</string>
+    <string name="all_notes">Все заметки</string>
 </resources>

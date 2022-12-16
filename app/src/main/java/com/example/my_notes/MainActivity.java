@@ -7,7 +7,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultOwner;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -25,8 +25,11 @@ import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapter;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
+import com.example.my_notes.ui.dialog.ConstantsNote;
+import com.example.my_notes.ui.dialog.DialogClickListener;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
 import com.example.my_notes.ui.detail.NoteDetailFragment;
+import com.example.my_notes.ui.dialog.MyBottomDialogFragmentGroup;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.example.my_notes.ui.list.NotesListFragment;
 import com.example.my_notes.ui.list.NotesListPresenter;
@@ -37,8 +40,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MyDialogFragment.ClickDatePickerDialog,
-        MyDialogFragmentImageView.CreateNewGroup {
+public class MainActivity extends AppCompatActivity implements DialogClickListener {
 
     public SharedPreferences pref;
 
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
     public List<Note> deleteNotes;
 
     private NotesListPresenter presenter;
+
+    private NotesListFragment notesListFragment;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -192,6 +196,39 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
                     fm.beginTransaction ( )
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( ConstantsNote.KEY_RESULT, this, new FragmentResultListener ( ) {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        note = result.getParcelable ( ConstantsNote.ARG_NOTE );
+                        Toast.makeText ( MainActivity.this, note.getTitle ( ), Toast.LENGTH_SHORT ).show ( );
+                        group_id = note.getGroup_id ( );
+                        showNotesList ( note );
+                    }
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( ConstantsNote.KEY_INDEX, this, new FragmentResultListener ( ) {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        long position = result.getInt ( ConstantsNote.ARG_INDEX );
+                        if (position > 0) {
+                            groups = getGroups ();
+                            position = groups.get ( (int) (position - 1) ).getId ();
+                        }
+                        removeAll(position);
+
+                    }
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( NotesListFragment.SHOW_ALL_NOTES, this, new FragmentResultListener ( ) {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        showAllNotes ();
+                    }
                 } );
     }
 
@@ -339,16 +376,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         super.onBackPressed ( );
     }
 
-    @Override
-    public void applySettings(String text, int id) {
-        TextView textView = findViewById ( id );
-        textView.setText ( text );
-    }
-
-    public List<Group> getGroups() {
-        return presenter.refreshGroup ( );
-    }
-
     public void fabEventHandling(FloatingActionButton fab, CharSequence title) {
         this.fab = fab;
         fab.setOnClickListener ( new View.OnClickListener ( ) {
@@ -403,14 +430,69 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
 
     public String getGroupName() {
         groups = presenter.refreshGroup ( );
+        String groupName = null;
         if (group_id > 0) {
             for (Group group : groups) {
                 if (group.getId ( ) == group_id) {
-                    return group.getName ( );
+                    groupName = group.getName ( );
                 }
             }
+        } else if (group_id == 0) {
+           groupName = "Все заметки";
+
+        } else {
+            groupName = getResources ( ).getString ( R.string.you_have_no_notes );
         }
-        return getResources ( ).getString ( R.string.you_have_no_notes );
+        return groupName;
+    }
+
+    public List<Note> searchNote(String newText) {
+        return presenter.search ( newText );
+    }
+
+    public void showAllNotes() {
+        groups = presenter.refreshGroup ();
+        if (groups.size () > 0) {
+            group_id = 0;
+        } else {
+            group_id = -1;
+        }
+
+        index = 0;
+        indexPrev = -1;
+
+        notes = presenter.refreshNotes ( 0 );
+
+        FragmentManager fm = getSupportFragmentManager ( );
+        fm.popBackStack ( );
+        fm.beginTransaction ( )
+                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                .commit ( );
+        if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            showDetails ( );
+        }
+    }
+
+    public void removeAll(long position) {
+        if ( position == 0 ) {
+            presenter.clearDb ( );
+        } else {
+            presenter.deleteIndexNoteGroupId ( position );
+            presenter.deleteIndexGroup ( position );
+        }
+        showAllNotes ();
+    }
+
+    @Override
+    public void applySettings(String text, int id) {
+        TextView textView = findViewById ( id );
+        textView.setText ( text );
+    }
+
+    @Override
+    public void showNotesListFragment(Note note) {
+        this.group_id = note.getGroup_id ( );
+        showNotesList ( note );
     }
 
     @Override
@@ -418,7 +500,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         newGroup = new Group ( -1, text, resourceId, 0 );
         presenter.addGroup ( newGroup );
         group_id = newGroup.getId ( );
-
 
 //        for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
 //            if (fragment instanceof NotesListFragment) {
@@ -429,30 +510,8 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         return group_id;
     }
 
-    public List<Note> searchNote(String newText) {
-        return presenter.search ( newText );
-    }
-
-    public void removeAll() {
-        presenter.clearDb ( );
-        notes = presenter.refreshNotes ( 0 );
-        index = 0;
-        indexPrev = -1;
-
-        FragmentManager fm = getSupportFragmentManager ( );
-        fm.popBackStack ( );
-        fm.beginTransaction ( )
-                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                .commit ( );
-        if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            showDetails ( );
-//                    savePosition ( );
-        }
-        recreate ( );
-    }
-
-    public void showNotesListFragment(Note note) {
-        this.group_id = note.getGroup_id ( );
-        showNotesList ( note );
+    @Override
+    public List<Group> getGroups() {
+        return presenter.refreshGroup ( );
     }
 }

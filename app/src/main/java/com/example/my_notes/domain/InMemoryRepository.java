@@ -35,7 +35,6 @@ public class InMemoryRepository implements NotesRepository {
         return groups;
     }
 
-
     @Override
     public Note addNote(Note note) {
         return dbManager.insertToDbNote (note);
@@ -70,16 +69,24 @@ public class InMemoryRepository implements NotesRepository {
         dbManager.deleteEntry(index);
     }
 
+    public void deleteIndexGroup(long index) {
+        dbManager.deleteEntryGroup (index);
+    }
+
     @Override
     public void closeDb() {
         dbManager.closeDb();
-//        dbManagerGroup.closeDb();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public List<Note> searchDb(String text) {
         return dbManager.searchDb ( text );
+    }
+
+    @Override
+    public void deleteIndexNoteGroupId(long position) {
+        dbManager.deleteIndexNoteGroupId(position);
     }
 
 }

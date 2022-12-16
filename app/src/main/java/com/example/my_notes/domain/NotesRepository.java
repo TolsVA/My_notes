@@ -16,6 +16,8 @@ public interface NotesRepository {
 
     void deleteIndex(long index);
 
+    void deleteIndexGroup(long index);
+
     void closeDb();
 
     List<Note> searchDb(String text);
@@ -25,4 +27,6 @@ public interface NotesRepository {
     int checkGroupForDbGroup(String text);
 
     List<Group> searchByGroupName(String folderName);
+
+    void deleteIndexNoteGroupId(long position);
 }

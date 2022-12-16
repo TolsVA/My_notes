@@ -5,12 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
-import android.provider.BaseColumns;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 
-import com.example.my_notes.MainActivity;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 
@@ -26,7 +23,7 @@ public class DbManager {
 
     // Определить проекцию, указывающую, какие столбцы из базы данных
     // вы фактически будете использовать после этого запроса.
-    String[] projection = {
+/*    String[] projection = {
             BaseColumns._ID,
             Constants.FeedEntryNote.NOTE_TITLE,
             Constants.FeedEntryNote.NOTE_CONTENT,
@@ -34,8 +31,8 @@ public class DbManager {
     };
 
     //Отфильтровать результаты, WHERE "название" = "Мое название"
-//    String selection = Constants.FeedEntryNote.NOTE_TITLE + " = ?";
-//    String[] selectionArgs = { "My Title" };
+    String selection = Constants.FeedEntryNote.NOTE_TITLE + " = ?";
+    String[] selectionArgs = { "My Title" };*/
 
     // Как вы хотите, чтобы результаты сортировались в результирующем курсоре
     String sortOrder =
@@ -77,8 +74,8 @@ public class DbManager {
     }
 
     public void deleteEntry(long index) {
-        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_ID + " = " + index, null);
-//        Toast.makeText(context, String.valueOf(index), Toast.LENGTH_SHORT).show();
+        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_ID
+                + " = " + index, null);
     }
 
     public List<Note> getFromDb(long group_id){
@@ -250,18 +247,18 @@ public class DbManager {
                 " GROUP BY " + Constants.FeedEntryGroup.TABLE_GROUP + "." + Constants.FeedEntryGroup.GROUP_NAME + ";";
 
         Cursor cursor = db.rawQuery ( sql, null, null );
-
-//        String selection = Constants.FeedEntryGroup.GROUP_NAME + " = ?";
-//        String[] selectionArgs = { folderName };
-//        Cursor cursor = db.query(
-//                Constants.FeedEntryGroup.TABLE_GROUP,    // Таблица для запроса
-//                null,           // Массив возвращаемых столбцов
-//                selection ,          // Столбцы для предложения WHERE
-//                selectionArgs,       // значения для предложения WHERE
-//                null,          // не группировать строки
-//                null,            // не фильтровать по группам строк
-//                null         // Порядок сортировки
-//        );
+/*
+        String selection = Constants.FeedEntryGroup.GROUP_NAME + " = ?";
+        String[] selectionArgs = { folderName };
+        Cursor cursor = db.query(
+                Constants.FeedEntryGroup.TABLE_GROUP,    // Таблица для запроса
+                null,           // Массив возвращаемых столбцов
+                selection ,          // Столбцы для предложения WHERE
+                selectionArgs,       // значения для предложения WHERE
+                null,          // не группировать строки
+                null,            // не фильтровать по группам строк
+                null         // Порядок сортировки
+        );*/
 
         List<Group> groups = new ArrayList<>();
         while(cursor.moveToNext()) {
@@ -284,5 +281,15 @@ public class DbManager {
         cursor.close();
         return groups;
 
+    }
+
+    public void deleteEntryGroup(long index) {
+        db.delete( Constants.FeedEntryGroup.TABLE_GROUP, Constants.FeedEntryGroup.GROUP_ID
+                + " = " + index, null);
+    }
+
+    public void deleteIndexNoteGroupId(long position) {
+        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_GROUP_ID
+                + " = " + position, null);
     }
 }
