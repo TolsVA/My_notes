@@ -74,8 +74,8 @@ public class DbManager {
     }
 
     public void deleteEntry(long index) {
-        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_ID + " = " + index, null);
-//        Toast.makeText(context, String.valueOf(index), Toast.LENGTH_SHORT).show();
+        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_ID
+                + " = " + index, null);
     }
 
     public List<Note> getFromDb(long group_id){
@@ -281,5 +281,15 @@ public class DbManager {
         cursor.close();
         return groups;
 
+    }
+
+    public void deleteEntryGroup(long index) {
+        db.delete( Constants.FeedEntryGroup.TABLE_GROUP, Constants.FeedEntryGroup.GROUP_ID
+                + " = " + index, null);
+    }
+
+    public void deleteIndexNoteGroupId(long position) {
+        db.delete( Constants.FeedEntryNote.TABLE_NOTE, Constants.FeedEntryNote.NOTE_GROUP_ID
+                + " = " + position, null);
     }
 }

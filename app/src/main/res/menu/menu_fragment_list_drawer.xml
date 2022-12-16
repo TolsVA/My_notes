@@ -17,6 +17,11 @@
                 android:title="@string/delete_folder"
                 app:showAsAction="ifRoom" />
             <item
+                android:id="@+id/all_notes"
+                android:title="@string/all_notes"
+                android:icon="@drawable/ic_baseline_folder_copy_24"
+                app:showAsAction="ifRoom" />
+            <item
                 android:id="@+id/search_nav_list"
                 android:title="@string/search"
                 app:actionViewClass="android.widget.SearchView"

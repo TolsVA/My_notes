@@ -51,4 +51,11 @@
     <string name="no_folders_to_save"><b><u>NO FOLDERS TO SAVE</u></b></string>
     <string name="save_new_folder">save new folder</string>
     <string name="delete_everything">delete everything</string>
+
+    <string name="first_item">Первый пункт</string>
+    <string name="second_item">Второй пункт</string>
+    <string name="third_item">Третий пункт</string>
+    <string name="delete_folder_2">delete folder</string>
+    <string name="all_notes">all notes</string>
+
 </resources>

@@ -7,6 +7,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentResultListener;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -24,6 +25,7 @@ import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapter;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
+import com.example.my_notes.ui.dialog.ConstantsNote;
 import com.example.my_notes.ui.dialog.DialogClickListener;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
 import com.example.my_notes.ui.detail.NoteDetailFragment;
@@ -72,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     public List<Note> deleteNotes;
 
     private NotesListPresenter presenter;
+
+    private NotesListFragment notesListFragment;
 
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
@@ -192,6 +196,39 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
                     fm.beginTransaction ( )
                             .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
                             .commit ( );
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( ConstantsNote.KEY_RESULT, this, new FragmentResultListener ( ) {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        note = result.getParcelable ( ConstantsNote.ARG_NOTE );
+                        Toast.makeText ( MainActivity.this, note.getTitle ( ), Toast.LENGTH_SHORT ).show ( );
+                        group_id = note.getGroup_id ( );
+                        showNotesList ( note );
+                    }
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( ConstantsNote.KEY_INDEX, this, new FragmentResultListener ( ) {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        long position = result.getInt ( ConstantsNote.ARG_INDEX );
+                        if (position > 0) {
+                            groups = getGroups ();
+                            position = groups.get ( (int) (position - 1) ).getId ();
+                        }
+                        removeAll(position);
+
+                    }
+                } );
+
+        getSupportFragmentManager ( )
+                .setFragmentResultListener ( NotesListFragment.SHOW_ALL_NOTES, this, new FragmentResultListener ( ) {
+                    @Override
+                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
+                        showAllNotes ();
+                    }
                 } );
     }
 
@@ -339,10 +376,6 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
         super.onBackPressed ( );
     }
 
-    public List<Group> getGroups() {
-        return presenter.refreshGroup ( );
-    }
-
     public void fabEventHandling(FloatingActionButton fab, CharSequence title) {
         this.fab = fab;
         fab.setOnClickListener ( new View.OnClickListener ( ) {
@@ -397,25 +430,38 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
 
     public String getGroupName() {
         groups = presenter.refreshGroup ( );
+        String groupName = null;
         if (group_id > 0) {
             for (Group group : groups) {
                 if (group.getId ( ) == group_id) {
-                    return group.getName ( );
+                    groupName = group.getName ( );
                 }
             }
+        } else if (group_id == 0) {
+           groupName = "Все заметки";
+
+        } else {
+            groupName = getResources ( ).getString ( R.string.you_have_no_notes );
         }
-        return getResources ( ).getString ( R.string.you_have_no_notes );
+        return groupName;
     }
 
     public List<Note> searchNote(String newText) {
         return presenter.search ( newText );
     }
 
-    public void removeAll() {
-        presenter.clearDb ( );
-        notes = presenter.refreshNotes ( 0 );
+    public void showAllNotes() {
+        groups = presenter.refreshGroup ();
+        if (groups.size () > 0) {
+            group_id = 0;
+        } else {
+            group_id = -1;
+        }
+
         index = 0;
         indexPrev = -1;
+
+        notes = presenter.refreshNotes ( 0 );
 
         FragmentManager fm = getSupportFragmentManager ( );
         fm.popBackStack ( );
@@ -424,9 +470,17 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
                 .commit ( );
         if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
             showDetails ( );
-//                    savePosition ( );
         }
-        recreate ( );
+    }
+
+    public void removeAll(long position) {
+        if ( position == 0 ) {
+            presenter.clearDb ( );
+        } else {
+            presenter.deleteIndexNoteGroupId ( position );
+            presenter.deleteIndexGroup ( position );
+        }
+        showAllNotes ();
     }
 
     @Override
@@ -454,5 +508,10 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
 //            }
 //        }
         return group_id;
+    }
+
+    @Override
+    public List<Group> getGroups() {
+        return presenter.refreshGroup ( );
     }
 }

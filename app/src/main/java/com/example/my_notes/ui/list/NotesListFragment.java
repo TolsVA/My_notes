@@ -1,6 +1,7 @@
 package com.example.my_notes.ui.list;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -41,11 +42,14 @@ import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapterGroup;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
+import com.example.my_notes.ui.dialog.DialogClickListener;
+import com.example.my_notes.ui.dialog.MyDialogFragmentChoose;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +60,7 @@ public class NotesListFragment extends Fragment{
 //    private final SimpleDateFormat formatDate = new SimpleDateFormat("E dd.BB.yyyy 'и время' hh:mm:ss a zzz", Locale.getDefault());
 
     public static final String TAG = "NotesListFragment";
+    public static final String SHOW_ALL_NOTES = "SHOW_ALL_NOTES";
 
     public LinearLayoutCompat notesContainer;
 
@@ -250,7 +255,12 @@ public class NotesListFragment extends Fragment{
                     } );
                     return true;
                 case R.id.delete_everything:
-                    ((MainActivity)requireActivity ()).removeAll();
+                    Activity activity = requireActivity ();
+                    if (activity instanceof DialogClickListener) {
+                        ((DialogClickListener) activity).getGroups ( );
+                    }
+                    MyDialogFragmentChoose fragment = MyDialogFragmentChoose.newInstance ( ((MainActivity)requireActivity ()).getGroups () );
+                    fragment.show ( getParentFragmentManager (), MyDialogFragmentChoose.TAG );
                     return true;
                 default:
                     return false;
@@ -274,6 +284,10 @@ public class NotesListFragment extends Fragment{
                     case R.id.search_nav_list:
                         Toast.makeText ( requireContext (), "search", Toast.LENGTH_SHORT ).show ( );
                         return true;
+                    case R.id.all_notes:
+                        getParentFragmentManager ( )
+                                .setFragmentResult ( SHOW_ALL_NOTES, null );
+                        return true;
                     default:
                         return false;
                 }
@@ -287,7 +301,7 @@ public class NotesListFragment extends Fragment{
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
 
             String groupName = ((MainActivity) getActivity ( )).getGroupName ();
-            toolbar.setTitle ( groupName );
+            setTitleToolbar(groupName);
 
             if (deleteNotes.size ( ) > 0) {
                 createBottomNavigation ( );
@@ -402,6 +416,10 @@ public class NotesListFragment extends Fragment{
                 } );
             }
         }
+    }
+
+    public void setTitleToolbar(String groupName) {
+        toolbar.setTitle ( groupName );
     }
 
     private void createBottomNavigation() {

@@ -272,7 +272,7 @@ public class NoteDetailFragment extends Fragment {
                                             return true;
                                         case R.id.create_new_folder:
                                             MyDialogFragmentImageView fragment = MyDialogFragmentImageView.newInstance ( note );
-                                            fragment.show ( getChildFragmentManager ( ), MyDialogFragmentImageView.TAG );
+                                            fragment.show ( getParentFragmentManager (), MyDialogFragmentImageView.TAG );
                                             return true;
                                         default:
                                             return false;
@@ -294,12 +294,12 @@ public class NoteDetailFragment extends Fragment {
                     case R.id.save_as:
                         List<Group> groups = ((MainActivity) getActivity ( )).getGroups ( );
                         MyBottomDialogFragmentGroup fragment = MyBottomDialogFragmentGroup.newInstance ( groups, note );
-                        fragment.show ( getChildFragmentManager ( ), MyBottomDialogFragmentGroup.TAG );
+                        fragment.show ( getParentFragmentManager (), MyBottomDialogFragmentGroup.TAG );
 
                         return true;
                     case R.id.save_new_folder:
                         MyDialogFragmentImageView f = MyDialogFragmentImageView.newInstance ( note );
-                        f.show ( getChildFragmentManager ( ), MyDialogFragmentImageView.TAG );
+                        f.show ( getParentFragmentManager (), MyDialogFragmentImageView.TAG );
                         return true;
                 }
                 return false;

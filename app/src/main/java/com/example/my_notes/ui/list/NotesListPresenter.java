@@ -38,6 +38,10 @@ public class NotesListPresenter {
         repository.deleteIndex(index);
     }
 
+    public void deleteIndexGroup(long index) {
+        repository.deleteIndexGroup (index);
+    }
+
     public void closeDb() {
         repository.closeDb ();
     }
@@ -55,5 +59,9 @@ public class NotesListPresenter {
 
     public List<Group> searchByGroupName(String folderName) {
         return repository.searchByGroupName(folderName);
+    }
+
+    public void deleteIndexNoteGroupId(long position) {
+        repository.deleteIndexNoteGroupId(position);
     }
 }

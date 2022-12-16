@@ -8,5 +8,19 @@
         <item>@drawable/ic_baseline_directions_run_24</item>
         <item>@drawable/ic_baseline_school_24</item>
         <item>@drawable/ic_baseline_people_alt_24</item>
+        <item>@drawable/ic_baseline_loop_24</item>
+        <item>@drawable/ic_baseline_checklist_24</item>
+        <item>@drawable/ic_baseline_delete_outline_24</item>
+        <item>@drawable/ic_baseline_download_24</item>
+        <item>@drawable/ic_baseline_logout_24</item>
+        <item>@drawable/ic_baseline_save_alt_24</item>
+        <item>@drawable/ic_baseline_save_24</item>
     </integer-array>
+
+    <string-array name="choose">
+        <item>@string/first_item</item>
+        <item>@string/second_item</item>
+        <item>@string/third_item</item>
+    </string-array>
+
 </resources>
