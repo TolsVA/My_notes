@@ -2,7 +2,6 @@ package com.example.my_notes.domain;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.widget.Adapter;
 
 public class Note implements Parcelable {
 

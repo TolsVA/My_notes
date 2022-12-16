@@ -6,18 +6,13 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.example.my_notes.domain.Group;
-import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.detail.GroupNameFragment;
-import com.example.my_notes.ui.detail.NoteDetailFragment;
 
 import java.util.List;
 
 public class MyAdapterGroup extends FragmentStateAdapter {
 
     private final List<Group> groups;
-
-    private FragmentActivity fragmentActivity;
-
 
     public MyAdapterGroup(FragmentActivity fragmentActivity, List<Group> groups) {
         super(fragmentActivity);

@@ -35,7 +35,6 @@ public class InMemoryRepository implements NotesRepository {
         return groups;
     }
 
-
     @Override
     public Note addNote(Note note) {
         return dbManager.insertToDbNote (note);
@@ -73,7 +72,6 @@ public class InMemoryRepository implements NotesRepository {
     @Override
     public void closeDb() {
         dbManager.closeDb();
-//        dbManagerGroup.closeDb();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.N)

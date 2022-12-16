@@ -1,18 +1,15 @@
 package com.example.my_notes.ui.dialog;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.os.Bundle;
-import android.widget.DatePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.my_notes.domain.Note;
-
 import java.util.Calendar;
-import java.util.List;
 
 public class MyDialogFragment extends DialogFragment {
 
@@ -22,17 +19,12 @@ public class MyDialogFragment extends DialogFragment {
 
     public static int id;
 
-
     public static MyDialogFragment newInstance(int id) {
         MyDialogFragment fragment = new MyDialogFragment ( );
         Bundle args = new Bundle ( );
         args.putInt ( ARG_TEXT_VIEW, id );
         fragment.setArguments ( args );
         return fragment;
-    }
-
-    public interface ClickDatePickerDialog {
-        void applySettings(String text, int id);
     }
 
     @Override
@@ -46,11 +38,11 @@ public class MyDialogFragment extends DialogFragment {
         int mMonth = cal.get(Calendar.MONTH);
         int mDay = cal.get(Calendar.DAY_OF_MONTH);
         return new DatePickerDialog(requireActivity (),
-                new DatePickerDialog.OnDateSetListener ( ) {
-                    @Override
-                    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                        String textDateParam = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
-                        ((ClickDatePickerDialog) MyDialogFragment.this.requireActivity ( )).applySettings ( textDateParam, id );
+                (view, year, monthOfYear, dayOfMonth) -> {
+                    String textDateParam = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
+                    Activity activity = requireActivity ( );
+                    if (activity instanceof DialogClickListener) {
+                        ((DialogClickListener) activity).applySettings (  textDateParam, id  );
                     }
                 }, mYear, mMonth, mDay);
     }

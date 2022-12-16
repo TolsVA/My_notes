@@ -7,7 +7,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentResultOwner;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
@@ -25,8 +24,10 @@ import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapter;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
+import com.example.my_notes.ui.dialog.DialogClickListener;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
 import com.example.my_notes.ui.detail.NoteDetailFragment;
+import com.example.my_notes.ui.dialog.MyBottomDialogFragmentGroup;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.example.my_notes.ui.list.NotesListFragment;
 import com.example.my_notes.ui.list.NotesListPresenter;
@@ -37,8 +38,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements MyDialogFragment.ClickDatePickerDialog,
-        MyDialogFragmentImageView.CreateNewGroup {
+public class MainActivity extends AppCompatActivity implements DialogClickListener {
 
     public SharedPreferences pref;
 
@@ -339,12 +339,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         super.onBackPressed ( );
     }
 
-    @Override
-    public void applySettings(String text, int id) {
-        TextView textView = findViewById ( id );
-        textView.setText ( text );
-    }
-
     public List<Group> getGroups() {
         return presenter.refreshGroup ( );
     }
@@ -413,22 +407,6 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         return getResources ( ).getString ( R.string.you_have_no_notes );
     }
 
-    @Override
-    public long createNewGroup(int resourceId, String text) {
-        newGroup = new Group ( -1, text, resourceId, 0 );
-        presenter.addGroup ( newGroup );
-        group_id = newGroup.getId ( );
-
-
-//        for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
-//            if (fragment instanceof NotesListFragment) {
-//                ((NotesListFragment) fragment).showFillMenu (  );
-//                break;
-//            }
-//        }
-        return group_id;
-    }
-
     public List<Note> searchNote(String newText) {
         return presenter.search ( newText );
     }
@@ -451,8 +429,30 @@ public class MainActivity extends AppCompatActivity implements MyDialogFragment.
         recreate ( );
     }
 
+    @Override
+    public void applySettings(String text, int id) {
+        TextView textView = findViewById ( id );
+        textView.setText ( text );
+    }
+
+    @Override
     public void showNotesListFragment(Note note) {
         this.group_id = note.getGroup_id ( );
         showNotesList ( note );
+    }
+
+    @Override
+    public long createNewGroup(int resourceId, String text) {
+        newGroup = new Group ( -1, text, resourceId, 0 );
+        presenter.addGroup ( newGroup );
+        group_id = newGroup.getId ( );
+
+//        for (Fragment fragment : this.getSupportFragmentManager ( ).getFragments ( )) {
+//            if (fragment instanceof NotesListFragment) {
+//                ((NotesListFragment) fragment).showFillMenu (  );
+//                break;
+//            }
+//        }
+        return group_id;
     }
 }

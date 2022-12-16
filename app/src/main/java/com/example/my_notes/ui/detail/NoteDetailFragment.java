@@ -4,49 +4,35 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.appcompat.widget.Toolbar;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
-import com.example.my_notes.ui.adapter.MyAdapterGroup;
-import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
-import com.example.my_notes.ui.dialog.MyDialogFragmentGroup;
+import com.example.my_notes.ui.dialog.MyBottomDialogFragmentGroup;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class NoteDetailFragment extends Fragment {
 
@@ -307,8 +293,8 @@ public class NoteDetailFragment extends Fragment {
                         return true;
                     case R.id.save_as:
                         List<Group> groups = ((MainActivity) getActivity ( )).getGroups ( );
-                        MyDialogFragmentGroup fragment = MyDialogFragmentGroup.newInstance ( groups, note );
-                        fragment.show ( getChildFragmentManager ( ), MyDialogFragmentGroup.TAG );
+                        MyBottomDialogFragmentGroup fragment = MyBottomDialogFragmentGroup.newInstance ( groups, note );
+                        fragment.show ( getChildFragmentManager ( ), MyBottomDialogFragmentGroup.TAG );
 
                         return true;
                     case R.id.save_new_folder:

@@ -12,12 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.example.my_notes.R;
-import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
-
 
 public class IconsFragment extends Fragment {
-
-    public static final String TAG = "IconsFragment";
 
     private static final String ARG_IMAGE = "ARG_IMAGE";
 
@@ -26,7 +22,7 @@ public class IconsFragment extends Fragment {
     public int icon;
 
     public IconsFragment() {
-        // Required empty public constructor
+
     }
 
     public static IconsFragment newInstance(int icon) {
@@ -48,7 +44,6 @@ public class IconsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         return inflater.inflate ( R.layout.fragment_icons, container, false );
     }
 
@@ -64,18 +59,5 @@ public class IconsFragment extends Fragment {
         iv.setMinimumWidth ( 150 );
         iv.setMinimumHeight ( 150 );
         iv.setColorFilter ( getResources ().getColor ( android.R.color.holo_red_dark, requireContext().getTheme()) );
-//        iv.setOnClickListener ( new View.OnClickListener ( ) {
-//            @Override
-//            public void onClick(View view) {
-//                Fragment fragment = getActivity ().getSupportFragmentManager ( )
-//                            .findFragmentByTag ( MyDialogFragmentImageView.TAG );
-//                ((MyDialogFragmentImageView) fragment).getImageView(icon);
-//            }
-//        } );
-
-
-//        Fragment fragment = getActivity ().getSupportFragmentManager ( )
-//                .findFragmentByTag ( MyDialogFragmentImageView.TAG );
-//        ((MyDialogFragmentImageView) fragment).getImageView(icon);
     }
 }
