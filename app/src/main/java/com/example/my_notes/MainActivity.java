@@ -291,8 +291,8 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     @SuppressLint("UseCompatLoadingForDrawables")
     private void selectPosition() {
 
-        NestedScrollView scrollView = findViewById ( R.id.scroll_list );
-        LinearLayoutCompat notesContainer = findViewById ( R.id.container_notes );
+//        NestedScrollView scrollView = findViewById ( R.id.scroll_list );
+//        LinearLayoutCompat notesContainer = findViewById ( R.id.container_notes );
 
 //        if (notes.size ( ) > 0) {
 //            scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
