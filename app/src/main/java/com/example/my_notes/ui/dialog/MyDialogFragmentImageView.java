@@ -73,14 +73,15 @@ public class MyDialogFragmentImageView extends DialogFragment {
                     Activity activity = requireActivity ( );
                     if (activity instanceof DialogClickListener) {
                         groupId = ((DialogClickListener) activity).createNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
-                        note.setGroup_id ( groupId );
+                        if (note != null) {
+                            note.setGroup_id ( groupId );
 //                        ((DialogClickListener) activity).showNotesListFragment ( note );
+                            Bundle bundle = new Bundle ( );
+                            bundle.putParcelable ( ConstantsNote.ARG_NOTE, note );
 
-                        Bundle bundle = new Bundle ();
-                        bundle.putParcelable ( ConstantsNote.ARG_NOTE, note );
-
-                        getParentFragmentManager ()
-                                .setFragmentResult ( ConstantsNote.KEY_RESULT, bundle );
+                            getParentFragmentManager ( )
+                                    .setFragmentResult ( ConstantsNote.KEY_RESULT, bundle );
+                        }
                     }
                 } )
                 .setNeutralButton("Отмена", null)
