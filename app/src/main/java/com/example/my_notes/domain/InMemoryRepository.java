@@ -88,5 +88,4 @@ public class InMemoryRepository implements NotesRepository {
     public void deleteIndexNoteGroupId(long position) {
         dbManager.deleteIndexNoteGroupId(position);
     }
-
 }

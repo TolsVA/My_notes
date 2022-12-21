@@ -1,4 +1,4 @@
-package com.example.my_notes.ui.adapter;
+package com.example.my_notes.ui.adapterItem;
 
 import android.view.View;
 import android.widget.CheckBox;

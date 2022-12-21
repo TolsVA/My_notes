@@ -33,9 +33,12 @@ import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
-import com.example.my_notes.ui.adapter.NotesAdapter;
-import com.example.my_notes.ui.adapter.OnClickItem;
-import com.example.my_notes.ui.adapter.OnLongClickItem;
+import com.example.my_notes.ui.adapterItem.AdapterItem;
+import com.example.my_notes.ui.adapterItem.GroupItem;
+import com.example.my_notes.ui.adapterItem.NoteItem;
+import com.example.my_notes.ui.adapterItem.ItemsAdapter;
+import com.example.my_notes.ui.adapterItem.OnClickItem;
+import com.example.my_notes.ui.adapterItem.OnLongClickItem;
 import com.example.my_notes.ui.dialog.DialogClickListener;
 import com.example.my_notes.ui.dialog.MyDialogFragmentChoose;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
@@ -55,7 +58,7 @@ public class NotesListFragment extends Fragment{
 
     public RecyclerView notesList;
 
-    private NotesAdapter adapter;
+    private ItemsAdapter adapter;
 
     public List<Note> notes, deleteNotes;
 
@@ -146,28 +149,44 @@ public class NotesListFragment extends Fragment{
             index = getArguments ( ).getInt ( ARG_INDEX );
             deleteNotes = getArguments ( ).getParcelableArrayList ( ADD_DELETE_KEY );
         }
-        adapter = new NotesAdapter ();
+        adapter = new ItemsAdapter ();
 
         adapter.setOnClickItem ( new OnClickItem ( ) {
             @Override
-            public void onClickItem(View view, Note note, int position) {
+            public void onClickItem(View view, NoteItem note, int position) {
                 if(previousClickedItemPosition != position) {
                     previousClickedItemPosition = position;
                     adapter.notifyDataSetChanged ();
+
+                    Bundle data = new Bundle ( );
+                    data.putParcelable ( ARG_NOTE, note.getNote () );
+
+                    getParentFragmentManager ( )
+                            .setFragmentResult ( RESULT_KEY, data );
                 }
             }
         } );
 
         adapter.setOnLongClickItem ( new OnLongClickItem ( ) {
             @Override
-            public void onLongClickItem(View view, Note note, int position, CheckBox checkBox) {
+            public void onLongClickItem(View view, NoteItem note, int position, CheckBox checkBox) {
                 if (checkBox.isChecked ( )) {
                     checkBox.setVisibility ( View.GONE );
                     checkBox.setChecked ( false );
+                    for (int i = 0; i < deleteNotes.size ( ); i++) {
+                            if (note.getNote ().getIndex () == deleteNotes.get ( i ).getIndex ( )) {
+                                deleteNotes.remove ( note );
+                            }
+                        }
+
                 } else {
+                    deleteNotes.add ( note.getNote () );
                     checkBox.setVisibility ( View.VISIBLE );
                     checkBox.setChecked ( true );
+
                 }
+
+                showNotes ( notes );
             }
         } );
 
@@ -288,6 +307,13 @@ public class NotesListFragment extends Fragment{
                     MyDialogFragmentChoose fragment = MyDialogFragmentChoose.newInstance ( ((MainActivity)requireActivity ()).getGroups () );
                     fragment.show ( getParentFragmentManager (), MyDialogFragmentChoose.TAG );
                     return true;
+                case R.id.load_pap:
+                    showGroup(((MainActivity)requireActivity ()).getGroups ());
+                    return true;
+                case R.id.load_notes:
+                    ((MainActivity)requireActivity ()).setGroupId ( 0 );
+                    showNotes ( ((MainActivity)requireActivity ()).getNotes () );
+                    return true;
                 default:
                     return false;
             }
@@ -321,10 +347,36 @@ public class NotesListFragment extends Fragment{
         } );
     }
 
+    private ArrayList<AdapterItem> castToType(List<Note> notes) {
+        ArrayList<AdapterItem> adapterItems = new ArrayList<> ();
+        for (Note note: notes) {
+            adapterItems.add ( new NoteItem ( note ) );
+        }
+        return adapterItems;
+    }
+
+    private ArrayList<AdapterItem> castToTypeGroup(List<Group> groups) {
+        ArrayList<AdapterItem> adapterItems = new ArrayList<> ();
+        for (Group group: groups) {
+//            adapterItems.add ( new GroupAdapterItem ( group, group.getName (), group.getIcon () ) );
+            adapterItems.add ( new GroupItem ( group ) );
+        }
+        return adapterItems;
+    }
+
+    private void showGroup(List<Group> groups) {
+        this.groups = groups;
+        ArrayList<AdapterItem> adapterItems = castToTypeGroup (groups);
+        adapter.setItems ( adapterItems );
+        adapter.notifyDataSetChanged ();
+    }
+
     public void showNotes(List<Note> notes) {
 //        notesContainer.removeAllViews ( );
+        ArrayList<AdapterItem> adapterItems = castToType(notes);
+        this.notes = notes;
 
-        adapter.setNotes ( notes );
+        adapter.setItems ( adapterItems );
         adapter.notifyDataSetChanged ();
 
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
