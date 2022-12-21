@@ -1,5 +1,6 @@
 package com.example.my_notes.ui.adapterItem;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,16 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private OnClickItem onClickItem;
 
     private OnLongClickItem onLongClickItem;
+
+    private OnClickItemGroup onClickItemGroup;
+
+    public OnClickItemGroup getOnClickItemGroup() {
+        return onClickItemGroup;
+    }
+
+    public void setOnClickItemGroup(OnClickItemGroup onClickItemGroup) {
+        this.onClickItemGroup = onClickItemGroup;
+    }
 
     public OnClickItem getOnClickItem() {
         return onClickItem;
@@ -83,6 +94,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         throw new IllegalStateException ("Всё плохо");
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof NoteViewHolder) {
@@ -101,16 +113,16 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
 
             noteViewHolder.getCardView ( ).setOnClickListener ( view -> {
-                if (getOnClickItem ( ) != null) {
-                    if (getPreviousClickedItemPosition ( ) != position) {
-                        setPreviousClickedItemPosition ( position );
+                if (ItemsAdapter.this.getOnClickItem ( ) != null) {
+                    if (ItemsAdapter.this.getPreviousClickedItemPosition ( ) != position) {
+                        ItemsAdapter.this.setPreviousClickedItemPosition ( position );
                     }
-                    getOnClickItem ( ).onClickItem ( view, note, position );
+                    ItemsAdapter.this.getOnClickItem ( ).onClickItem ( view, note, position );
                 }
             } );
             noteViewHolder.getCardView ( ).setOnLongClickListener ( view -> {
-                if (getOnLongClickItem ( ) != null) {
-                    getOnLongClickItem ( ).onLongClickItem ( view, note, position, noteViewHolder.getCheckBox ( ) );
+                if (ItemsAdapter.this.getOnLongClickItem ( ) != null) {
+                    ItemsAdapter.this.getOnLongClickItem ( ).onLongClickItem ( view, note, position, noteViewHolder.getCheckBox ( ) );
                 }
                 return true;
             } );
@@ -120,8 +132,14 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             GroupViewHolder groupViewHolder = (GroupViewHolder) holder;
             GroupItem group = ((GroupItem) items.get ( position ));
 
-            groupViewHolder.getButtonGroup ().setText ( group.getGroup ().getName () );
+            groupViewHolder.getButtonGroup ().setText ( group.getGroup ().getName () + ": " + group.getGroup ().getCount ());
             groupViewHolder.getButtonGroup ().setIconResource ( group.getGroup ().getIcon () );
+
+            groupViewHolder.getButtonGroup ().setOnClickListener ( view -> {
+                if (getOnClickItemGroup ( ) != null) {
+                    getOnClickItemGroup ().onClickItemGroup ( view, group, position );
+                }
+            } );
         }
     }
 

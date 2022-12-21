@@ -10,7 +10,7 @@ public interface NotesRepository {
 
     void upgradeNote(Note note);
 
-    Note addNote(Note note);
+    void addNote(Note note);
 
     void clearDb();
 
@@ -22,7 +22,7 @@ public interface NotesRepository {
 
     List<Note> searchDb(String text);
 
-    Group addGroup(Group group);
+    void addGroup(Group group);
 
     int checkGroupForDbGroup(String text);
 

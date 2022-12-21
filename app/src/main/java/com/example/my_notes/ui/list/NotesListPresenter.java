@@ -2,6 +2,7 @@ package com.example.my_notes.ui.list;
 
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
+import com.example.my_notes.domain.NoteListView;
 import com.example.my_notes.domain.NotesRepository;
 
 import java.util.List;
@@ -10,16 +11,19 @@ public class NotesListPresenter {
 
     private final NotesRepository repository;
 
-    public NotesListPresenter(NotesRepository repository) {
+    private final NoteListView view;
+
+    public NotesListPresenter(NotesRepository repository, NoteListView view) {
         this.repository = repository;
+        this.view = view;
     }
 
     public void upgradeNote(Note note) {
         repository.upgradeNote(note);
     }
 
-    public Note addNote(Note note) {
-        return repository.addNote(note);
+    public void addNote(Note note) {
+        repository.addNote ( note );
     }
 
     public void clearDb(){
@@ -30,9 +34,9 @@ public class NotesListPresenter {
         return repository.searchDb(text);
     }
 
-    public int checkGroupFor(String text){
+/*    public int checkGroupFor(String text){
         return repository.checkGroupForDbGroup ( text );
-    }
+    }*/
 
     public void deleteIndex(long index) {
         repository.deleteIndex(index);
@@ -47,19 +51,34 @@ public class NotesListPresenter {
     }
 
     public List<Note> refreshNotes(long group_id) {
-        return repository.getAllNotes(group_id);
+
+        view.showProgress ();
+
+//        repository.getAllNotes(group_id, new Callback<List<Note>> ( ) {
+//            @Override
+//            public void onSuccess(List<Note> result) {
+//                view.hideProgress ();
+//                notes = result;
+//            }
+//
+//            @Override
+//            public void onError(Throwable error) {
+//                view.hideProgress ();
+//            }
+//        } );
+        return repository.getAllNotes ( group_id );
     }
     public List<Group> refreshGroup() {
         return repository.getAllGroup ();
     }
 
-    public Group addGroup(Group group) {
-        return repository.addGroup(group);
+    public void addGroup(Group group) {
+        repository.addGroup ( group );
     }
 
-    public List<Group> searchByGroupName(String folderName) {
+/*    public List<Group> searchByGroupName(String folderName) {
         return repository.searchByGroupName(folderName);
-    }
+    }*/
 
     public void deleteIndexNoteGroupId(long position) {
         repository.deleteIndexNoteGroupId(position);

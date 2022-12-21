@@ -26,7 +26,6 @@ public class MyBottomDialogFragmentGroup extends BottomSheetDialogFragment {
 
     public static final String ARG_GROUP = "ARG_GROUP";
     public static final String ARG_NOTE = "ARG_NOTE";
-    public static final String KEY_RESULT = "KEY_RESULT";
 
     public Note note;
     public List<Group> groups;

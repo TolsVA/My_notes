@@ -4,7 +4,7 @@ import com.example.my_notes.domain.Group;
 
 public class GroupItem implements AdapterItem {
 
-    private Group group;
+    private final Group group;
 
     public GroupItem(Group group) {
         this.group = group;

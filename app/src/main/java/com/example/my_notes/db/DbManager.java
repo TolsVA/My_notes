@@ -20,24 +20,8 @@ public class DbManager {
     private SQLiteDatabase db;
     Context context;
 
-
-    // Определить проекцию, указывающую, какие столбцы из базы данных
-    // вы фактически будете использовать после этого запроса.
-/*    String[] projection = {
-            BaseColumns._ID,
-            Constants.FeedEntryNote.NOTE_TITLE,
-            Constants.FeedEntryNote.NOTE_CONTENT,
-            Constants.FeedEntryNote.NOTE_DATA
-    };
-
-    //Отфильтровать результаты, WHERE "название" = "Мое название"
-    String selection = Constants.FeedEntryNote.NOTE_TITLE + " = ?";
-    String[] selectionArgs = { "My Title" };*/
-
-    // Как вы хотите, чтобы результаты сортировались в результирующем курсоре
     String sortOrder =
             Constants.FeedEntryNote.NOTE_ID + " DESC";
-
 
     public DbManager(Context context) {
         this.context = context;

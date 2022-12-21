@@ -15,7 +15,6 @@ public class GroupViewHolder extends RecyclerView.ViewHolder {
 
     public GroupViewHolder(@NonNull View itemView) {
         super ( itemView );
-//        buttonGroup = itemView.findViewById ( R.id.name_group );
         buttonGroup = itemView.findViewById ( R.id.group_icon );
     }
 
