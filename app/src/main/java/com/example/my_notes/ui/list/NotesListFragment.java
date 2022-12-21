@@ -13,35 +13,32 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
-import androidx.appcompat.widget.LinearLayoutCompat;
-
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
-import androidx.core.widget.NestedScrollView;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
-
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
-import com.example.my_notes.ui.adapter.MyAdapterGroup;
-import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
+import com.example.my_notes.ui.adapterItem.AdapterItem;
+import com.example.my_notes.ui.adapterItem.GroupItem;
+import com.example.my_notes.ui.adapterItem.NoteItem;
+import com.example.my_notes.ui.adapterItem.ItemsAdapter;
+import com.example.my_notes.ui.adapterItem.OnClickItem;
+import com.example.my_notes.ui.adapterItem.OnLongClickItem;
 import com.example.my_notes.ui.dialog.DialogClickListener;
 import com.example.my_notes.ui.dialog.MyDialogFragmentChoose;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
@@ -49,11 +46,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationBarView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.snackbar.Snackbar;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class NotesListFragment extends Fragment{
 
@@ -62,7 +56,9 @@ public class NotesListFragment extends Fragment{
     public static final String TAG = "NotesListFragment";
     public static final String SHOW_ALL_NOTES = "SHOW_ALL_NOTES";
 
-    public LinearLayoutCompat notesContainer;
+    public RecyclerView notesList;
+
+    private ItemsAdapter adapter;
 
     public List<Note> notes, deleteNotes;
 
@@ -103,6 +99,8 @@ public class NotesListFragment extends Fragment{
     public ImageView chooseAll;
 
     public ViewPager2 pager2;
+
+    private int previousClickedItemPosition = -1;
 
     public NotesListFragment() {
     }
@@ -151,6 +149,47 @@ public class NotesListFragment extends Fragment{
             index = getArguments ( ).getInt ( ARG_INDEX );
             deleteNotes = getArguments ( ).getParcelableArrayList ( ADD_DELETE_KEY );
         }
+        adapter = new ItemsAdapter ();
+
+        adapter.setOnClickItem ( new OnClickItem ( ) {
+            @Override
+            public void onClickItem(View view, NoteItem note, int position) {
+                if(previousClickedItemPosition != position) {
+                    previousClickedItemPosition = position;
+                    adapter.notifyDataSetChanged ();
+
+                    Bundle data = new Bundle ( );
+                    data.putParcelable ( ARG_NOTE, note.getNote () );
+
+                    getParentFragmentManager ( )
+                            .setFragmentResult ( RESULT_KEY, data );
+                }
+            }
+        } );
+
+        adapter.setOnLongClickItem ( new OnLongClickItem ( ) {
+            @Override
+            public void onLongClickItem(View view, NoteItem note, int position, CheckBox checkBox) {
+                if (checkBox.isChecked ( )) {
+                    checkBox.setVisibility ( View.GONE );
+                    checkBox.setChecked ( false );
+                    for (int i = 0; i < deleteNotes.size ( ); i++) {
+                            if (note.getNote ().getIndex () == deleteNotes.get ( i ).getIndex ( )) {
+                                deleteNotes.remove ( note );
+                            }
+                        }
+
+                } else {
+                    deleteNotes.add ( note.getNote () );
+                    checkBox.setVisibility ( View.VISIBLE );
+                    checkBox.setChecked ( true );
+
+                }
+
+                showNotes ( notes );
+            }
+        } );
+
         setHasOptionsMenu ( true );
     }
 
@@ -177,7 +216,13 @@ public class NotesListFragment extends Fragment{
 
         bottomNavigationView = view.findViewById ( R.id.bottom_navigation );//popup
 
-        notesContainer = view.findViewById ( R.id.container_notes );
+
+        notesList = view.findViewById ( R.id.notes_list );
+        notesList.setLayoutManager ( new LinearLayoutManager ( requireContext (), LinearLayoutManager.VERTICAL, false ) );
+//        notesList.setLayoutManager ( new GridLayoutManager ( requireContext (), 2 ) );
+//        notesList.setLayoutManager ( new StaggeredGridLayoutManager ( 8,0 ) );
+
+        notesList.setAdapter ( adapter );
 
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
             supplyToolbar ( toolbar );
@@ -200,9 +245,9 @@ public class NotesListFragment extends Fragment{
 
         showNotes ( notes );
 
-        NestedScrollView scrollView = view.findViewById ( R.id.scroll_list );
-
-        scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
+//        NestedScrollView scrollView = view.findViewById ( R.id.scroll_list );
+//
+//        scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
 
 //        if (notes.size ( ) != 0 && index >= 0) {
 //            notesContainer.getChildAt ( index ).setBackground ( getResources ( ).getDrawable ( R.drawable.layout_bg_2, requireContext ( ).getTheme ( ) ) );
@@ -262,6 +307,13 @@ public class NotesListFragment extends Fragment{
                     MyDialogFragmentChoose fragment = MyDialogFragmentChoose.newInstance ( ((MainActivity)requireActivity ()).getGroups () );
                     fragment.show ( getParentFragmentManager (), MyDialogFragmentChoose.TAG );
                     return true;
+                case R.id.load_pap:
+                    showGroup(((MainActivity)requireActivity ()).getGroups ());
+                    return true;
+                case R.id.load_notes:
+                    ((MainActivity)requireActivity ()).setGroupId ( 0 );
+                    showNotes ( ((MainActivity)requireActivity ()).getNotes () );
+                    return true;
                 default:
                     return false;
             }
@@ -295,8 +347,37 @@ public class NotesListFragment extends Fragment{
         } );
     }
 
+    private ArrayList<AdapterItem> castToType(List<Note> notes) {
+        ArrayList<AdapterItem> adapterItems = new ArrayList<> ();
+        for (Note note: notes) {
+            adapterItems.add ( new NoteItem ( note ) );
+        }
+        return adapterItems;
+    }
+
+    private ArrayList<AdapterItem> castToTypeGroup(List<Group> groups) {
+        ArrayList<AdapterItem> adapterItems = new ArrayList<> ();
+        for (Group group: groups) {
+//            adapterItems.add ( new GroupAdapterItem ( group, group.getName (), group.getIcon () ) );
+            adapterItems.add ( new GroupItem ( group ) );
+        }
+        return adapterItems;
+    }
+
+    private void showGroup(List<Group> groups) {
+        this.groups = groups;
+        ArrayList<AdapterItem> adapterItems = castToTypeGroup (groups);
+        adapter.setItems ( adapterItems );
+        adapter.notifyDataSetChanged ();
+    }
+
     public void showNotes(List<Note> notes) {
-        notesContainer.removeAllViews ( );
+//        notesContainer.removeAllViews ( );
+        ArrayList<AdapterItem> adapterItems = castToType(notes);
+        this.notes = notes;
+
+        adapter.setItems ( adapterItems );
+        adapter.notifyDataSetChanged ();
 
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
 
@@ -322,100 +403,100 @@ public class NotesListFragment extends Fragment{
         }
 
 
-        for (Note note : notes) {
-            View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );
-
-//            registerForContextMenu ( itemView );//context_menu
-
-            TextView title = itemView.findViewById ( R.id.note_title );
-            title.setText ( note.getTitle ( ) );
-
-            TextView text = itemView.findViewById ( R.id.note_text );
-            text.setText ( note.getText ( ) );
-
-            TextView data = itemView.findViewById ( R.id.note_date );
-
-            CheckBox checkBox = itemView.findViewById ( R.id.delete_index );
-
-            for (int i = 0; i < deleteNotes.size ( ); i++) {
-                if (note.getIndex ( ) == deleteNotes.get ( i ).getIndex ( )) {
-                    checkBox.setChecked ( true );
-                }
-            }
-
-/*            SimpleDateFormat formatDate = null;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                formatDate = new SimpleDateFormat("день недели:  EEEE\n дата________:   dd MMMM yyyy" +
-//                        "\nВремя______:   hh:mm", Locale.getDefault());
-                formatDate = new SimpleDateFormat ( "EEEE  dd MMMM yyyy   hh:mm", Locale.getDefault ( ) );
-            }
-
-            assert formatDate != null;
-            StringBuilder sb = new StringBuilder(formatDate.format( Date.parse ( note.getData() )).toLowerCase());
-            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
-            String data1 = sb.toString();
-
-            data.setText(data1);*/
-
-            data.setText ( note.getData ( ) );
-
-            notesContainer.addView ( itemView );
-
-            if (deleteNotes.size ( ) > 0) {
-                checkBox.setVisibility ( View.VISIBLE );
-                itemView.setOnClickListener ( view -> {
-                    if (checkBox.isChecked ( )) {
-                        checkBox.setChecked ( false );
-                        for (int i = 0; i < deleteNotes.size ( ); i++) {
-                            if (note.getIndex ( ) == deleteNotes.get ( i ).getIndex ( )) {
-                                deleteNotes.remove ( note );
-                            }
-                        }
-                    } else {
-                        checkBox.setChecked ( true );
-                        deleteNotes.add ( note );
-                    }
-
-                    checkBox.setOnClickListener ( new View.OnClickListener ( ) {
-                        @Override
-                        public void onClick(View view) {
-                            Bundle data1 = new Bundle ( );
-                            data1.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
-
-                            getParentFragmentManager ( )
-                                    .setFragmentResult ( CREATE_DELETE_KEY, data1 );
-                        }
-                    } );
-
-                    Bundle data1 = new Bundle ( );
-                    data1.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
-
-                    getParentFragmentManager ( )
-                            .setFragmentResult ( CREATE_DELETE_KEY, data1 );
-                } );
-            } else {
-                itemView.setOnClickListener ( view -> {
-                    Bundle data12 = new Bundle ( );
-                    data12.putParcelable ( ARG_NOTE, note );
-
-                    getParentFragmentManager ( )
-                            .setFragmentResult ( RESULT_KEY, data12 );
-                } );
-
-                itemView.setOnLongClickListener ( view -> {
-                    checkBox.setVisibility ( View.VISIBLE );
-                    checkBox.setChecked ( true );
-                    deleteNotes.add ( note );
-
-                    Bundle data13 = new Bundle ( );
-                    data13.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
-
-                    getParentFragmentManager ( )
-                            .setFragmentResult ( CREATE_DELETE_KEY, data13 );
-                    return false;
-                } );
-            }
-        }
+//        for (Note note : notes) {
+//            View itemView = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_note, notesContainer, false );
+//
+////            registerForContextMenu ( itemView );//context_menu
+//
+//            TextView title = itemView.findViewById ( R.id.note_title );
+//            title.setText ( note.getTitle ( ) );
+//
+//            TextView text = itemView.findViewById ( R.id.note_text );
+//            text.setText ( note.getText ( ) );
+//
+//            TextView data = itemView.findViewById ( R.id.note_date );
+//
+//            CheckBox checkBox = itemView.findViewById ( R.id.delete_index );
+//
+//            for (int i = 0; i < deleteNotes.size ( ); i++) {
+//                if (note.getIndex ( ) == deleteNotes.get ( i ).getIndex ( )) {
+//                    checkBox.setChecked ( true );
+//                }
+//            }
+//
+///*            SimpleDateFormat formatDate = null;
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+////                formatDate = new SimpleDateFormat("день недели:  EEEE\n дата________:   dd MMMM yyyy" +
+////                        "\nВремя______:   hh:mm", Locale.getDefault());
+//                formatDate = new SimpleDateFormat ( "EEEE  dd MMMM yyyy   hh:mm", Locale.getDefault ( ) );
+//            }
+//
+//            assert formatDate != null;
+//            StringBuilder sb = new StringBuilder(formatDate.format( Date.parse ( note.getData() )).toLowerCase());
+//            sb.setCharAt(0, Character.toUpperCase(sb.charAt(0)));
+//            String data1 = sb.toString();
+//
+//            data.setText(data1);*/
+//
+//            data.setText ( note.getData ( ) );
+//
+//            notesContainer.addView ( itemView );
+//
+//            if (deleteNotes.size ( ) > 0) {
+//                checkBox.setVisibility ( View.VISIBLE );
+//                itemView.setOnClickListener ( view -> {
+//                    if (checkBox.isChecked ( )) {
+//                        checkBox.setChecked ( false );
+//                        for (int i = 0; i < deleteNotes.size ( ); i++) {
+//                            if (note.getIndex ( ) == deleteNotes.get ( i ).getIndex ( )) {
+//                                deleteNotes.remove ( note );
+//                            }
+//                        }
+//                    } else {
+//                        checkBox.setChecked ( true );
+//                        deleteNotes.add ( note );
+//                    }
+//
+//                    checkBox.setOnClickListener ( new View.OnClickListener ( ) {
+//                        @Override
+//                        public void onClick(View view) {
+//                            Bundle data1 = new Bundle ( );
+//                            data1.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
+//
+//                            getParentFragmentManager ( )
+//                                    .setFragmentResult ( CREATE_DELETE_KEY, data1 );
+//                        }
+//                    } );
+//
+//                    Bundle data1 = new Bundle ( );
+//                    data1.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
+//
+//                    getParentFragmentManager ( )
+//                            .setFragmentResult ( CREATE_DELETE_KEY, data1 );
+//                } );
+//            } else {
+//                itemView.setOnClickListener ( view -> {
+//                    Bundle data12 = new Bundle ( );
+//                    data12.putParcelable ( ARG_NOTE, note );
+//
+//                    getParentFragmentManager ( )
+//                            .setFragmentResult ( RESULT_KEY, data12 );
+//                } );
+//
+//                itemView.setOnLongClickListener ( view -> {
+//                    checkBox.setVisibility ( View.VISIBLE );
+//                    checkBox.setChecked ( true );
+//                    deleteNotes.add ( note );
+//
+//                    Bundle data13 = new Bundle ( );
+//                    data13.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) deleteNotes );
+//
+//                    getParentFragmentManager ( )
+//                            .setFragmentResult ( CREATE_DELETE_KEY, data13 );
+//                    return false;
+//                } );
+//            }
+//        }
     }
 
     public void setTitleToolbar(String groupName) {

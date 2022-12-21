@@ -57,5 +57,7 @@
     <string name="third_item">Третий пункт</string>
     <string name="delete_folder_2">delete folder</string>
     <string name="all_notes">all notes</string>
+    <string name="load_pap">Load pap</string>
+    <string name="load_notes">Load notes</string>
 
 </resources>

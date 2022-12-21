@@ -15,6 +15,16 @@
             android:icon="@drawable/ic_baseline_delete_outline_24"
             app:showAsAction="ifRoom">
         </item>
+        <item
+            android:id="@+id/load_pap"
+            android:title="@string/load_pap"
+            app:showAsAction="never">
+        </item>
+        <item
+            android:id="@+id/load_notes"
+            android:title="@string/load_notes"
+            app:showAsAction="never">
+        </item>
     </group>
 
 </menu>
