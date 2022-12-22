@@ -14,6 +14,7 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -70,6 +71,8 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
 
     private NotesListPresenter presenter;
 
+    private ProgressBar progress;
+
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState ( outState );
@@ -92,6 +95,8 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate ( savedInstanceState );
         setContentView ( R.layout.activity_main );
+
+        progress = findViewById ( R.id.progress_bar );
 
         deleteNotes = new ArrayList<> ( );
 
@@ -487,17 +492,12 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     }
 
     @Override
-    public void showNotes(List<Note> notes) {
-
-    }
-
-    @Override
     public void showProgress() {
-
+        progress.setVisibility ( View.VISIBLE );
     }
 
     @Override
     public void hideProgress() {
-
+        progress.setVisibility ( View.GONE );
     }
 }

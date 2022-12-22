@@ -14,9 +14,6 @@ public class InMemoryRepository implements NotesRepository {
 
     public List<Group> groups;
 
-/*    private Executor executor = Executors.newSingleThreadExecutor ();
-    private Handler handler = new Handler ( Looper.getMainLooper () );*/
-
     public InMemoryRepository(Context context) {
         dbManager = new DbManager(context);
         dbManager.openDb();
@@ -27,26 +24,6 @@ public class InMemoryRepository implements NotesRepository {
         notes = dbManager.getFromDb(group_id);
         return notes;
     }
-
-/*    @Override
-    public void getAllNotes(long group_id, Callback<List<Note>> callback) {
-        executor.execute ( new Runnable ( ) {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep ( 1000L );
-                } catch (InterruptedException e) {
-                    e.printStackTrace ( );
-                }
-                handler.post ( new Runnable ( ) {
-                    @Override
-                    public void run() {
-                        callback.onSuccess ( dbManager.getFromDb(group_id) );
-                    }
-                } );
-            }
-        } );
-    }*/
 
     @Override
     public List<Group> getAllGroup() {

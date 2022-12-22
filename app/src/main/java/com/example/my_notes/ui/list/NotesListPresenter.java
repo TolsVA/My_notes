@@ -1,11 +1,16 @@
 package com.example.my_notes.ui.list;
 
+import android.os.Handler;
+import android.os.Looper;
+
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.domain.NoteListView;
 import com.example.my_notes.domain.NotesRepository;
 
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class NotesListPresenter {
 
@@ -51,21 +56,6 @@ public class NotesListPresenter {
     }
 
     public List<Note> refreshNotes(long group_id) {
-
-        view.showProgress ();
-
-//        repository.getAllNotes(group_id, new Callback<List<Note>> ( ) {
-//            @Override
-//            public void onSuccess(List<Note> result) {
-//                view.hideProgress ();
-//                notes = result;
-//            }
-//
-//            @Override
-//            public void onError(Throwable error) {
-//                view.hideProgress ();
-//            }
-//        } );
         return repository.getAllNotes ( group_id );
     }
     public List<Group> refreshGroup() {
