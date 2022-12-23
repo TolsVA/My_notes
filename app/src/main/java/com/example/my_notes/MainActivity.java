@@ -197,21 +197,21 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
                             .commit ( );
                 } );
 
-        getSupportFragmentManager ( )
-                .setFragmentResultListener ( NotesListFragment.DELETE_NOTE_KEY, this, (requestKey, result) -> {
-                    deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_DELETE_NOTE );
-
-                    for (Note note : deleteNotes) {
-                        presenter.deleteIndex ( note.getId ( ) );
-                    }
-                    deleteNotes.clear ( );
-//                    notes = presenter.refreshNotes ( group_id );
-                    index = 0;
-//                    FragmentManager fm = getSupportFragmentManager ( );
-                    fm.beginTransaction ( )
-                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                            .commit ( );
-                } );
+//        getSupportFragmentManager ( )
+//                .setFragmentResultListener ( NotesListFragment.DELETE_NOTE_KEY, this, (requestKey, result) -> {
+//                    deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_DELETE_NOTE );
+//
+//                    for (Note note : deleteNotes) {
+//                        presenter.deleteIndex ( note.getId ( ) );
+//                    }
+//                    deleteNotes.clear ( );
+////                    notes = presenter.refreshNotes ( group_id );
+//                    index = 0;
+////                    FragmentManager fm = getSupportFragmentManager ( );
+//                    fm.beginTransaction ( )
+//                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+//                            .commit ( );
+//                } );
 
         getSupportFragmentManager ( )
                 .setFragmentResultListener ( ConstantsNote.KEY_INDEX, this, (requestKey, result) -> {

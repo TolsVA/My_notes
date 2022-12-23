@@ -468,6 +468,12 @@ public class NotesListFragment extends Fragment implements NoteListView {
     }
 
     @Override
+    public void deleteNotes(List<Note> deleteNotes) {
+        adapter.addItems ( position, new NoteItem ( note ) );
+        deleteNotes.remove (  )
+    }
+
+    @Override
     public void addNote(Note note) {
         int position = 0;
         adapter.addItems ( position, new NoteItem ( note ) );
@@ -496,40 +502,28 @@ public class NotesListFragment extends Fragment implements NoteListView {
             if(previousClickedItemPosition != position) {
                 previousClickedItemPosition = position;
                 adapter.notifyDataSetChanged ( );
-
-                if (checkBox.isChecked ( )) {
-                    checkBox.setVisibility ( View.GONE );
-                    checkBox.setChecked ( false );
-                    for (int i = 0; i < deleteNotes.size ( ); i++) {
-                        if (note.getNote ( ).getId ( ) == deleteNotes.get ( i ).getId ( )) {
-                            deleteNotes.remove ( note.getNote ( ) );
-                        }
-                    }
-                } else {
-                    deleteNotes.add ( note.getNote ( ) );
-                    checkBox.setVisibility ( View.VISIBLE );
-                    checkBox.setChecked ( true );
-
-                }
-            } else {
-                if (checkBox.isChecked ( )) {
-                    checkBox.setVisibility ( View.GONE );
-                    checkBox.setChecked ( false );
-                    for (int i = 0; i < deleteNotes.size ( ); i++) {
-                        if (note.getNote ( ).getId ( ) == deleteNotes.get ( i ).getId ( )) {
-                            deleteNotes.remove ( note.getNote ( ) );
-                        }
-                    }
-                } else {
-                    deleteNotes.add ( note.getNote ( ) );
-                    checkBox.setVisibility ( View.VISIBLE );
-                    checkBox.setChecked ( true );
-                    showNotes ( notes );
-                }
             }
+            isCheckedNotes(note, checkBox);
+            showNotes ( notes );
         } );
 
         adapter.setOnClickItemGroup ( (view, groupItem, position) -> Toast.makeText ( NotesListFragment.this.requireContext ( ), groupItem.getGroup ( ).getName ( ), Toast.LENGTH_SHORT ).show ( ) );
+    }
+
+    private void isCheckedNotes(NoteItem note, CheckBox checkBox) {
+        if (checkBox.isChecked ( )) {
+            checkBox.setVisibility ( View.GONE );
+            checkBox.setChecked ( false );
+            for (int i = 0; i < deleteNotes.size ( ); i++) {
+                if (note.getNote ( ).getId ( ) == deleteNotes.get ( i ).getId ( )) {
+                    deleteNotes.remove ( note.getNote ( ) );
+                }
+            }
+        } else {
+            deleteNotes.add ( note.getNote ( ) );
+            checkBox.setVisibility ( View.VISIBLE );
+            checkBox.setChecked ( true );
+        }
     }
 
 
@@ -551,11 +545,14 @@ public class NotesListFragment extends Fragment implements NoteListView {
                     Toast.makeText ( requireContext ( ), "Здесь что-то будет", Toast.LENGTH_SHORT ).show ( );
                     return true;
                 case R.id.delete_selected_notes:
-                    Bundle data = new Bundle ( );
-                    data.putParcelableArrayList ( ARG_DELETE_NOTE, (ArrayList<? extends Parcelable>) deleteNotes );
-
-                    getParentFragmentManager ( )
-                            .setFragmentResult ( DELETE_NOTE_KEY, data );
+                    presenter.deleteIndex ( group_id, deleteNotes );
+                    deleteNotes.clear ( );
+//                    notes = presenter.refreshNotes ( group_id );
+                    index = 0;
+//                    FragmentManager fm = getSupportFragmentManager ( );
+                    fm.beginTransaction ( )
+                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                            .commit ( );
                     return true;
             }
             return false;

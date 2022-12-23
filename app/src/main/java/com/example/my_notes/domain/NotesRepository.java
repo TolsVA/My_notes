@@ -14,7 +14,7 @@ public interface NotesRepository {
 
     void clearDb();
 
-    void deleteIndex(long index);
+    void deleteIndex(long group_id, List<Note> deleteNotes, Callback<List<Note>> callback);
 
     void deleteIndexGroup(long index);
 
