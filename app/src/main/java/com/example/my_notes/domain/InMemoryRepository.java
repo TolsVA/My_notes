@@ -79,6 +79,27 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
+    public void deleteIndex(long group_id, List<Note> deleteNotes, Callback<List<Note>> callback) {
+        executor.execute( () -> {
+//            try {
+//                Thread.sleep(1000L);
+//            } catch (InterruptedException e) {
+//                e.printStackTrace();
+//            }
+
+            handler.post( new Runnable ( ) {
+                @Override
+                public void run() {
+                    for (Note note: deleteNotes) {
+                        dbManager.deleteEntry(note.getId ());
+                    }
+                    callback.onSuccess ( dbManager.getFromDb(group_id) );
+                }
+            } );
+        } );
+    }
+
+    @Override
     public void upgradeNote(Note note) {
         dbManager.upgradeEntry(note);
     }

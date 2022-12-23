@@ -49,8 +49,21 @@ public class NotesListPresenter {
         return repository.checkGroupForDbGroup ( text );
     }*/
 
-    public void deleteIndex(long index) {
-        repository.deleteIndex(index);
+    public void deleteIndex(long group_id, List<Note> deleteNotes) {
+//        view.showProgress();
+        repository.deleteIndex (group_id, deleteNotes, new Callback<List<Note>> ( ) {
+            @Override
+            public void onSuccess(List<Note> result) {
+//                view.showNotes(result);
+//                view.hideProgress();
+            }
+
+            @Override
+            public void onError(Throwable error) {
+//                view.hideProgress();
+            }
+        } );
+        view.deleteNotes ( deleteNotes );
     }
 
     public void deleteIndexGroup(long index) {

@@ -11,6 +11,8 @@ public interface NoteListView {
 
     void upgradeNote(Note note);
 
+    void deleteNotes(List<Note> deleteNotes);
+
     void addNote(Note note);
 
     void showProgress();
