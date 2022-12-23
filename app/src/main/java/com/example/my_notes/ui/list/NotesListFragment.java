@@ -2,6 +2,7 @@ package com.example.my_notes.ui.list;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -12,8 +13,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,20 +24,32 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
+
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
+import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
+import com.example.my_notes.domain.NoteListView;
+import com.example.my_notes.ui.adapter.MyAdapter;
+import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
 import com.example.my_notes.ui.adapterItem.AdapterItem;
 import com.example.my_notes.ui.adapterItem.GroupItem;
 import com.example.my_notes.ui.adapterItem.NoteItem;
 import com.example.my_notes.ui.adapterItem.ItemsAdapter;
+import com.example.my_notes.ui.detail.NoteDetailFragment;
 import com.example.my_notes.ui.dialog.DialogClickListener;
+import com.example.my_notes.ui.dialog.MyBottomDialogFragmentGroup;
 import com.example.my_notes.ui.dialog.MyDialogFragmentChoose;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -43,12 +58,25 @@ import com.google.android.material.navigation.NavigationView;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NotesListFragment extends Fragment{
+public class NotesListFragment extends Fragment implements NoteListView {
 
 //    private final SimpleDateFormat formatDate = new SimpleDateFormat("E dd.BB.yyyy 'и время' hh:mm:ss a zzz", Locale.getDefault());
 
     public static final String TAG = "NotesListFragment";
     public static final String SHOW_ALL_NOTES = "SHOW_ALL_NOTES";
+
+    public SharedPreferences pref;
+
+    public static final String ARG_INDEX = "NotesListFragment_ARG_INDEX";
+    public static final String ARG_GROUP_ID = "NotesListFragment_ARG_GROUP_ID";
+
+    public Note note, newNote;
+
+    public Group group;
+
+    public Group newGroup;
+
+    public long group_id;
 
     public RecyclerView notesList;
 
@@ -66,8 +94,6 @@ public class NotesListFragment extends Fragment{
 
     public static final String DELETE_NOTE_KEY = "DELETE_NOTE_KEY";
 
-    public static final String ARG_INDEX = "ARG_INDEX";
-
     public static final String RESULT_KEY = "NotesListFragment_RESULT";
 
     public static final String ADD_DELETE_KEY = "NotesListFragment_ADD_DELETE";
@@ -75,6 +101,8 @@ public class NotesListFragment extends Fragment{
     public static final String CREATE_DELETE_KEY = "NotesListFragment_CREATE_DELETE";
 
     public int index;
+
+    public int indexPrev = -1;
 
     public Toolbar toolbar;
 
@@ -91,10 +119,22 @@ public class NotesListFragment extends Fragment{
     public TextView deleteCounter;
     public TextView counter;
     public ImageView chooseAll;
+    public CheckBox check;
 
+    private NotesListPresenter presenter;
+
+    private ProgressBar progress;
+
+    public ViewPager2 pager;
+
+    private View itemView;
 //    public ViewPager2 pager2;
 
+    private CoordinatorLayout coordinatorLayout;
+
     private int previousClickedItemPosition = -1;
+
+    private ArrayList<AdapterItem> adapterItems;
 
     public NotesListFragment() {
     }
@@ -140,42 +180,58 @@ public class NotesListFragment extends Fragment{
             index = getArguments ( ).getInt ( ARG_INDEX );
             deleteNotes = getArguments ( ).getParcelableArrayList ( ADD_DELETE_KEY );
         }
+
         adapter = new ItemsAdapter ();
 
-        adapter.setOnClickItem ( (view, note, position) -> {
-            if(previousClickedItemPosition != position) {
-                previousClickedItemPosition = position;
-                adapter.notifyDataSetChanged ();
-                Bundle data = new Bundle ( );
-                data.putParcelable ( ARG_NOTE, note.getNote () );
-                data.putInt ( ARG_INDEX, position );
-
-                getParentFragmentManager ( )
-                        .setFragmentResult ( RESULT_KEY, data );
-            }
-        } );
-
-        adapter.setOnLongClickItem ( (view, note, position, checkBox) -> {
-            if (checkBox.isChecked ( )) {
-                checkBox.setVisibility ( View.GONE );
-                checkBox.setChecked ( false );
-                for (int i = 0; i < deleteNotes.size ( ); i++) {
-                        if (note.getNote ().getIndex () == deleteNotes.get ( i ).getIndex ( )) {
-                            deleteNotes.remove ( note.getNote () );
-                        }
-                    }
-            } else {
-                deleteNotes.add ( note.getNote () );
-                checkBox.setVisibility ( View.VISIBLE );
-                checkBox.setChecked ( true );
-
-            }
-            showNotes ( notes );
-        } );
-
-        adapter.setOnClickItemGroup ( (view, groupItem, position) -> Toast.makeText ( NotesListFragment.this.requireContext ( ), groupItem.getGroup ( ).getName ( ), Toast.LENGTH_SHORT ).show ( ) );
-
         setHasOptionsMenu ( true );
+
+        setOnClickAdapter(adapter);
+
+        getParentFragmentManager ()
+                .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
+                    note = result.getParcelable ( NoteDetailFragment.ARG_NOTE );
+
+                    removeNoteDetailFragment();
+
+                    presenter.upgradeNote ( note );
+
+                    if (group_id != note.getGroup_id ( )) {
+                        group_id = note.getGroup_id ( );
+                        presenter.refreshNotes ( group_id );
+                    }
+
+                    toolbar.setTitle ( getGroupName () );
+                } );
+
+        getParentFragmentManager ()
+                .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
+                    note = result.getParcelable ( NoteDetailFragment.ARG_NEW_NOTE );
+
+                    removeNoteDetailFragment();
+
+                    presenter.addNote ( note );
+
+                    if (group_id != note.getGroup_id ()) {
+                        group_id = note.getGroup_id ();
+                        presenter.refreshNotes ( group_id );
+                    }
+
+                    presenter.refreshNotes ( group_id );
+
+                    toolbar.setTitle ( getGroupName () );
+                } );
+    }
+
+    private void removeNoteDetailFragment() {
+        Fragment fmList = getParentFragmentManager ()
+                .findFragmentByTag ( NoteDetailFragment.TAG );
+
+        FragmentManager fm = getParentFragmentManager ();
+        fm.popBackStack ();
+        assert fmList != null;
+        fm.beginTransaction ( )
+                .remove ( fmList )
+                .commit ( );
     }
 
     @Override
@@ -193,7 +249,10 @@ public class NotesListFragment extends Fragment{
         drawer = view.findViewById ( R.id.drawer );
         toolbar = view.findViewById ( R.id.toolbar );
         fab = view.findViewById ( R.id.fab );
+        progress = view.findViewById (R.id.progress_bar);
+        pager = view.findViewById (R.id.fragment_container_detail);
 
+        coordinatorLayout = view.findViewById ( R.id.fragment_container );
         layoutToolbar = view.findViewById ( R.id.layout_toolbar );
         deleteCounter = view.findViewById ( R.id.delete_counter );
         counter = view.findViewById ( R.id.counter );
@@ -204,29 +263,20 @@ public class NotesListFragment extends Fragment{
         notesList = view.findViewById ( R.id.notes_list );
         notesList.setLayoutManager ( new LinearLayoutManager ( requireContext (), LinearLayoutManager.VERTICAL, false ) );
 //        notesList.setLayoutManager ( new GridLayoutManager ( requireContext (), 2 ) );
-
         notesList.setAdapter ( adapter );
 
-        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            supplyToolbar ( toolbar );
-            toolbar.getMenu ().getItem (  1  ).getIcon ().setTint ( getResources ().getColor ( R.color.purple_700, requireContext ().getTheme ()  ) );
-            createNavView ( navigationView );
-            toolbarItemClick(); // Проверить
+        adapterItems = new ArrayList<> ();
 
-/*            pager2 = view.findViewById ( R.id.pager_group );
-            groups = ((MainActivity) requireActivity ( )).getGroups ();
-            pager2.setAdapter ( new MyAdapterGroup ( requireActivity (), groups ) );
-            pager2.setPageTransformer ( new ZoomOutPageTransformer ( ) );
+        if (savedInstanceState == null) {
+            presenter = new NotesListPresenter ( requireContext ( ), new InMemoryRepository ( requireContext ( ) ), this );
 
-            long groupId = ((MainActivity) requireActivity ( )).getGroupId();
-            pager2.setCurrentItem ( (int) groupId, false );
-
-            savePosition ( );*/
-
-            ((MainActivity) requireActivity ( )).fabEventHandling ( fab );
+            Activity activity = requireActivity ( );
+            ((MainActivity) activity).getPresenter ( presenter );
         }
 
-        showNotes ( notes );
+
+
+//        showNotes ( notes );
 
 /*        NestedScrollView scrollView = view.findViewById ( R.id.scroll_list );
 
@@ -287,15 +337,15 @@ public class NotesListFragment extends Fragment{
                     if (activity instanceof DialogClickListener) {
                         ((DialogClickListener) activity).getGroups ( );
                     }
-                    MyDialogFragmentChoose fragment = MyDialogFragmentChoose.newInstance ( ((MainActivity)requireActivity ()).getGroups () );
+                    MyDialogFragmentChoose fragment = MyDialogFragmentChoose.newInstance ( ((MainActivity)getActivity ()).getGroups () );
                     fragment.show ( getParentFragmentManager (), MyDialogFragmentChoose.TAG );
                     return true;
                 case R.id.load_pap:
-                    showGroup(((MainActivity)requireActivity ()).getGroups ());
+                    showGroup(((MainActivity)getActivity ()).getGroups ());
                     return true;
                 case R.id.load_notes:
                     ((MainActivity)requireActivity ()).setGroupId ( 0 );
-                    showNotes ( ((MainActivity)requireActivity ()).getNotes () );
+//                    showNotes ( ((MainActivity)requireActivity ()).getNotes () );
                     return true;
                 default:
                     return false;
@@ -332,7 +382,7 @@ public class NotesListFragment extends Fragment{
     }
 
     private ArrayList<AdapterItem> castToType(List<Note> notes) {
-        ArrayList<AdapterItem> adapterItems = new ArrayList<> ();
+        adapterItems.clear ();
         for (Note note: notes) {
             adapterItems.add ( new NoteItem ( note ) );
         }
@@ -340,7 +390,7 @@ public class NotesListFragment extends Fragment{
     }
 
     private ArrayList<AdapterItem> castToTypeGroup(List<Group> groups) {
-        ArrayList<AdapterItem> adapterItems = new ArrayList<> ();
+        adapterItems.clear ();
         for (Group group: groups) {
             adapterItems.add ( new GroupItem ( group ) );
         }
@@ -350,23 +400,48 @@ public class NotesListFragment extends Fragment{
     @SuppressLint("NotifyDataSetChanged")
     private void showGroup(List<Group> groups) {
         this.groups = groups;
-        ArrayList<AdapterItem> adapterItems = castToTypeGroup (groups);
+        adapterItems = castToTypeGroup (groups);
         adapter.setItems ( adapterItems );
         adapter.notifyDataSetChanged ();
     }
 
     @SuppressLint("NotifyDataSetChanged")
     public void showNotes(List<Note> notes) {
-//        notesContainer.removeAllViews ( );
-        ArrayList<AdapterItem> adapterItems = castToType(notes);
+        this.notes = notes;
+
+        adapterItems = castToType(notes);
 
         adapter.setItems ( adapterItems );
         adapter.notifyDataSetChanged ();
 
+
         if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-            Activity activity = requireActivity ();
-            String groupName = ((MainActivity) activity).getGroupName ( );
-            setTitleToolbar ( groupName );
+            supplyToolbar ( toolbar );
+            toolbar.getMenu ().getItem (  1  ).getIcon ().setTint ( getResources ().getColor ( R.color.purple_700, requireContext ().getTheme ()  ) );
+            createNavView ( navigationView );
+            toolbarItemClick(); // Проверить
+
+/*            pager2 = view.findViewById ( R.id.pager_group );
+            groups = ((MainActivity) requireActivity ( )).getGroups ();
+            pager2.setAdapter ( new MyAdapterGroup ( requireActivity (), groups ) );
+            pager2.setPageTransformer ( new ZoomOutPageTransformer ( ) );
+
+            long groupId = ((MainActivity) requireActivity ( )).getGroupId();
+            pager2.setCurrentItem ( (int) groupId, false );
+
+            savePosition ( );*/
+
+            ((MainActivity) requireActivity ( )).fabEventHandling ( fab );
+        }
+
+
+
+        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
+//            Activity activity = requireActivity ();
+//            String groupName = ((MainActivity) activity).getGroupName ( );
+//            setTitleToolbar ( groupName );
+
+            toolbar.setTitle ( getGroupName () );
 
             if (deleteNotes.size ( ) > 0) {
                 createBottomNavigation ( );
@@ -386,6 +461,77 @@ public class NotesListFragment extends Fragment{
             bottomNavigationView.setVisibility ( View.GONE );
         }
     }
+
+    @Override
+    public void upgradeNote(Note note) {
+
+    }
+
+    @Override
+    public void addNote(Note note) {
+        int position = 0;
+        adapter.addItems ( position, new NoteItem ( note ) );
+        adapter.notifyItemInserted ( position );
+        notesList.scrollToPosition ( position );
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    private void setOnClickAdapter(ItemsAdapter adapter) {
+        adapter.setOnClickItem ( (view, note, position) -> {
+            if(previousClickedItemPosition != position) {
+                previousClickedItemPosition = position;
+                adapter.notifyDataSetChanged ();
+
+                Bundle data = new Bundle ( );
+                data.putParcelable ( ARG_NOTE, note.getNote () );
+                data.putInt ( ARG_INDEX, position );
+                data.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) notes );
+
+                getParentFragmentManager ( )
+                        .setFragmentResult ( RESULT_KEY, data );
+            }
+        } );
+
+        adapter.setOnLongClickItem ( (view, note, position, checkBox) -> {
+            if(previousClickedItemPosition != position) {
+                previousClickedItemPosition = position;
+                adapter.notifyDataSetChanged ( );
+
+                if (checkBox.isChecked ( )) {
+                    checkBox.setVisibility ( View.GONE );
+                    checkBox.setChecked ( false );
+                    for (int i = 0; i < deleteNotes.size ( ); i++) {
+                        if (note.getNote ( ).getId ( ) == deleteNotes.get ( i ).getId ( )) {
+                            deleteNotes.remove ( note.getNote ( ) );
+                        }
+                    }
+                } else {
+                    deleteNotes.add ( note.getNote ( ) );
+                    checkBox.setVisibility ( View.VISIBLE );
+                    checkBox.setChecked ( true );
+
+                }
+            } else {
+                if (checkBox.isChecked ( )) {
+                    checkBox.setVisibility ( View.GONE );
+                    checkBox.setChecked ( false );
+                    for (int i = 0; i < deleteNotes.size ( ); i++) {
+                        if (note.getNote ( ).getId ( ) == deleteNotes.get ( i ).getId ( )) {
+                            deleteNotes.remove ( note.getNote ( ) );
+                        }
+                    }
+                } else {
+                    deleteNotes.add ( note.getNote ( ) );
+                    checkBox.setVisibility ( View.VISIBLE );
+                    checkBox.setChecked ( true );
+                    showNotes ( notes );
+                }
+            }
+        } );
+
+        adapter.setOnClickItemGroup ( (view, groupItem, position) -> Toast.makeText ( NotesListFragment.this.requireContext ( ), groupItem.getGroup ( ).getName ( ), Toast.LENGTH_SHORT ).show ( ) );
+    }
+
 
     public void setTitleToolbar(String groupName) {
         toolbar.setTitle ( groupName );
@@ -460,7 +606,7 @@ public class NotesListFragment extends Fragment{
     }
 
     public void fillMenu( Menu menu ) {
-        List<Group> groups = ((MainActivity) requireActivity ( )).getGroups ();
+        groups = presenter.refreshGroup ( );
         for (int i = 0; i < groups.size (); i++){
             final int position = i;
             menu.add ( R.id.group, i + 1, Menu.NONE, groups.get ( i ).getName () )
@@ -470,10 +616,9 @@ public class NotesListFragment extends Fragment{
             TextView textNameGroup = menu.getItem ( i + 1 ).getActionView ().findViewById ( R.id.value_counter_notes );
             textNameGroup.setText (  String.valueOf ( groups.get ( position ).getCount () ) );
             menu.getItem ( i + 1 ).setOnMenuItemClickListener ( menuItem -> {
-                long group_id = groups.get ( position ).getId ();
-                ((MainActivity) requireActivity ( )).setGroupId(group_id);
-                notes = ((MainActivity) requireActivity ( )).getNotes();
-                showNotes ( notes );
+                group_id = groups.get ( position ).getId ();
+//                toolbar.setTitle ( getGroupName () );
+                presenter.refreshNotes ( group_id );
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             } );
@@ -485,4 +630,37 @@ public class NotesListFragment extends Fragment{
         menu.removeGroup ( R.id.group );
         fillMenu ( menu );
     }
+
+
+    @Override
+    public void showProgress() {
+        progress.setVisibility ( View.VISIBLE );
+    }
+
+    @Override
+    public void hideProgress() {
+        progress.setVisibility ( View.GONE );
+    }
+
+    public String getGroupName() {
+        groups = presenter.refreshGroup ( );
+        if (groups.size () == 0) {
+            group_id = -1;
+        }
+        String groupName = null;
+        if (group_id > 0) {
+            for (Group group : groups) {
+                if (group.getId ( ) == group_id) {
+                    groupName = group.getName ( );
+                }
+            }
+        } else if (group_id == 0) {
+            groupName = "Все заметки";
+
+        } else {
+            groupName = getResources ( ).getString ( R.string.you_have_no_notes );
+        }
+        return groupName;
+    }
+
 }

@@ -55,6 +55,11 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         this.items.addAll ( items );
     }
 
+    public void addItems(int position, AdapterItem item) {
+        this.items.add ( position, item );
+        items.size ( );
+    }
+
     public int getPreviousClickedItemPosition() {
         return previousClickedItemPosition;
     }
@@ -104,6 +109,7 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             noteViewHolder.getText ( ).setText ( note.getNote ().getText () );
             noteViewHolder.getData ( ).setText ( String.valueOf ( note.getNote ().getData () ) );
             noteViewHolder.getCheckBox ( ).isChecked ( );
+//            noteViewHolder.getCheckBox ( ).set
 
             if (getPreviousClickedItemPosition ( ) != position) {
                 noteViewHolder.getCardView ( ).setCardBackgroundColor ( Color.WHITE );
@@ -122,6 +128,9 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             } );
             noteViewHolder.getCardView ( ).setOnLongClickListener ( view -> {
                 if (ItemsAdapter.this.getOnLongClickItem ( ) != null) {
+                    if (ItemsAdapter.this.getPreviousClickedItemPosition ( ) != position) {
+                        ItemsAdapter.this.setPreviousClickedItemPosition ( position );
+                    }
                     ItemsAdapter.this.getOnLongClickItem ( ).onLongClickItem ( view, note, position, noteViewHolder.getCheckBox ( ) );
                 }
                 return true;

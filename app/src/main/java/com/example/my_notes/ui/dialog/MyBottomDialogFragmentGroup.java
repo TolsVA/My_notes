@@ -14,6 +14,7 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
+import com.example.my_notes.ui.detail.NoteDetailFragment;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.android.material.button.MaterialButton;
 
@@ -24,8 +25,10 @@ public class MyBottomDialogFragmentGroup extends BottomSheetDialogFragment {
 
     public static final String TAG = "MyBottomDialogFragmentGroup";
 
-    public static final String ARG_GROUP = "ARG_GROUP";
-    public static final String ARG_NOTE = "ARG_NOTE";
+    public static final String ARG_GROUP = "MyBottomDialogFragmentGroup_ARG_GROUP";
+    public static final String ARG_NOTE = "MyBottomDialogFragmentGroup_ARG_NOTE";
+    public static final String ARG_NEW_NOTE = "MyBottomDialogFragmentGroup_ARG_NEW_NOTE";
+    public static final String RESULT_KEY_DIALOG = "MyBottomDialogFragmentGroup_RESULT_KEY_DIALOG";
 
     public Note note;
     public List<Group> groups;
@@ -82,13 +85,14 @@ public class MyBottomDialogFragmentGroup extends BottomSheetDialogFragment {
             if (note.getGroup_id ( ) == 0) {
                 Toast.makeText ( requireContext ( ), "Не выбрана папка для сохранения", Toast.LENGTH_SHORT ).show ( );
             } else {
-
                 Bundle bundle = new Bundle ( );
-                bundle.putParcelable ( ConstantsNote.ARG_NOTE, note );
-
+                if (note.getId () <= 0) {
+                    bundle.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
+                } else {
+                    bundle.putParcelable ( NoteDetailFragment.ARG_NOTE, note );
+                }
                 getParentFragmentManager ( )
-                        .setFragmentResult ( ConstantsNote.KEY_RESULT, bundle );
-
+                        .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, bundle );
                 dismiss ( );
             }
         } );

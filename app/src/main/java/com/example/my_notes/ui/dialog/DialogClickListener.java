@@ -13,4 +13,6 @@ public interface DialogClickListener {
     long createNewGroup(int resourceId, String valueOf);
 
     List<Group> getGroups();
+
+    long getGroupId();
 }

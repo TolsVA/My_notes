@@ -4,7 +4,7 @@ import java.util.List;
 
 public interface NotesRepository {
 
-    List<Note> getAllNotes(long group_id);
+    void getAllNotes(long group_id, Callback<List<Note>> callback);
 
     List<Group> getAllGroup();
 

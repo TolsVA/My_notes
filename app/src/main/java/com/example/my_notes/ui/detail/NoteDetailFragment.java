@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,18 +23,20 @@ import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
+import com.example.my_notes.ui.dialog.DialogClickListener;
 import com.example.my_notes.ui.dialog.MyDialogFragment;
 import com.example.my_notes.ui.dialog.MyBottomDialogFragmentGroup;
 import com.example.my_notes.ui.dialog.MyDialogFragmentImageView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NoteDetailFragment extends Fragment {
 
     public static final String TAG = "NoteDetailFragment";
 
-    public static final String ARG_NOTE = "ARG_NOTE";
+    public static final String ARG_NOTE = "NoteDetailFragmentARG_NOTE";
 
     public static final String ARG_NEW_NOTE = "ARG_NEW_NOTE";
 
@@ -172,10 +175,9 @@ public class NoteDetailFragment extends Fragment {
             item.setCheckable ( false );
             switch (item.getItemId ( )) {
                 case R.id.save:
+                    Activity activity = requireActivity ( );
                     String s = getResources ( ).getString ( R.string.you_have_no_notes );
                     if (toolbar.getTitle ( ).equals ( s )) {
-
-                        Activity activity = requireActivity ( );
                         PopupMenu popupMenu = new PopupMenu ( activity, textView );
                         activity.getMenuInflater ( ).inflate ( R.menu.popup_menu_detail, popupMenu.getMenu ( ) );
 
@@ -185,13 +187,15 @@ public class NoteDetailFragment extends Fragment {
                                     int iconResourceId = R.drawable.ic_baseline_folder_24;
                                     String name = getString ( R.string.uncategorized );
 
-                                    groupId = ((MainActivity) requireActivity ( )).createNewGroup ( iconResourceId, name );
+                                    groupId = ((DialogClickListener) activity).createNewGroup ( iconResourceId, name );
 
-/*                                            toolbar.setTitle ( name );
-                                    groupId = ((MainActivity) requireActivity ( )).getGroupId ( );*/
                                     note.setGroup_id ( groupId );
 
-                                    ((MainActivity) requireActivity ( )).showNotesListFragment ( note );
+                                    Bundle data = new Bundle ( );
+                                    data.putParcelable ( ARG_NEW_NOTE, note );
+
+                                    getParentFragmentManager ( )
+                                            .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
                                     return true;
                                 case R.id.create_new_folder:
                                     MyDialogFragmentImageView fragment = MyDialogFragmentImageView.newInstance ( note );
@@ -203,17 +207,23 @@ public class NoteDetailFragment extends Fragment {
                         } );
                         popupMenu.show ( );
                     } else {
-                        groupId = ((MainActivity) requireActivity ( )).getGroupId ( );
-                        note.setGroup_id ( groupId );
-
-                        ((MainActivity) requireActivity ( )).showNotesListFragment ( note );
+                        Bundle bundle = new Bundle ( );
+                        if (note.getId () <= 0) {
+                            groupId = ((DialogClickListener) activity).getGroupId ();
+                            note.setGroup_id ( groupId );
+                            bundle.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
+                        } else {
+                            bundle.putParcelable ( NoteDetailFragment.ARG_NOTE, note );
+                        }
+                        getParentFragmentManager ( )
+                                .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, bundle );
                     }
                     return true;
                 case R.id.save_as:
-                    Activity activity = getActivity ();
+                    activity = getActivity ();
                     List<Group> groups = null;
                     if (activity != null) {
-                        groups = ((MainActivity) activity).getGroups ( );
+                        groups = ((DialogClickListener) activity).getGroups ( );
                     }
                     MyBottomDialogFragmentGroup fragment = MyBottomDialogFragmentGroup.newInstance ( groups, note );
                     fragment.show ( getParentFragmentManager (), MyBottomDialogFragmentGroup.TAG );

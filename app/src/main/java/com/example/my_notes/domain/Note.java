@@ -23,11 +23,11 @@ public class Note implements Parcelable {
         this.group_id = _group_id;
     }
 
-    public long getIndex() {
+    public long getId() {
         return id;
     }
 
-    public void setIndex(long index) {
+    public void setId(long index) {
         this.id = index;
     }
 

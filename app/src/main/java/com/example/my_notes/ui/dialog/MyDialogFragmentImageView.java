@@ -18,6 +18,7 @@ import com.example.my_notes.R;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapterIcon;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
+import com.example.my_notes.ui.detail.NoteDetailFragment;
 
 public class MyDialogFragmentImageView extends DialogFragment {
 
@@ -75,12 +76,14 @@ public class MyDialogFragmentImageView extends DialogFragment {
                         groupId = ((DialogClickListener) activity).createNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
                         if (note != null) {
                             note.setGroup_id ( groupId );
-//                        ((DialogClickListener) activity).showNotesListFragment ( note );
                             Bundle bundle = new Bundle ( );
-                            bundle.putParcelable ( ConstantsNote.ARG_NOTE, note );
-
+                            if (note.getId () <= 0) {
+                                bundle.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
+                            } else {
+                                bundle.putParcelable ( NoteDetailFragment.ARG_NOTE, note );
+                            }
                             getParentFragmentManager ( )
-                                    .setFragmentResult ( ConstantsNote.KEY_RESULT, bundle );
+                                    .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, bundle );
                         }
                     }
                 } )
