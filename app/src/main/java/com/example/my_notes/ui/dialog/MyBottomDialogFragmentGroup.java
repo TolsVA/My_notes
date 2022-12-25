@@ -27,8 +27,6 @@ public class MyBottomDialogFragmentGroup extends BottomSheetDialogFragment {
 
     public static final String ARG_GROUP = "MyBottomDialogFragmentGroup_ARG_GROUP";
     public static final String ARG_NOTE = "MyBottomDialogFragmentGroup_ARG_NOTE";
-    public static final String ARG_NEW_NOTE = "MyBottomDialogFragmentGroup_ARG_NEW_NOTE";
-    public static final String RESULT_KEY_DIALOG = "MyBottomDialogFragmentGroup_RESULT_KEY_DIALOG";
 
     public Note note;
     public List<Group> groups;
@@ -62,7 +60,7 @@ public class MyBottomDialogFragmentGroup extends BottomSheetDialogFragment {
 
         LinearLayoutCompat groupContainer = customView.findViewById ( R.id.container_group );
         for (int i = 0; i < groups.size ( ); i++) {
-            final int resourceId = groups.get ( i ).getIcon ( );
+            int resourceId = groups.get ( i ).getIcon ( );
             View view = LayoutInflater.from ( requireContext ( ) ).inflate ( R.layout.item_group, groupContainer, false );
 
             MaterialButton buttonGroupName = view.findViewById ( R.id.group_icon );
@@ -85,14 +83,10 @@ public class MyBottomDialogFragmentGroup extends BottomSheetDialogFragment {
             if (note.getGroup_id ( ) == 0) {
                 Toast.makeText ( requireContext ( ), "Не выбрана папка для сохранения", Toast.LENGTH_SHORT ).show ( );
             } else {
-                Bundle bundle = new Bundle ( );
-                if (note.getId () <= 0) {
-                    bundle.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
-                } else {
-                    bundle.putParcelable ( NoteDetailFragment.ARG_NOTE, note );
-                }
+                Bundle data = new Bundle ( );
+                data.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
                 getParentFragmentManager ( )
-                        .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, bundle );
+                        .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, data );
                 dismiss ( );
             }
         } );

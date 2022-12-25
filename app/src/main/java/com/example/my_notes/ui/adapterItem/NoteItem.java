@@ -6,8 +6,8 @@ public class NoteItem implements AdapterItem {
 
     private final Note note;
 
-    public NoteItem(Note note) {
-        this.note = note;
+    public NoteItem(Note item) {
+        this.note = item;
     }
 
     public Note getNote() {

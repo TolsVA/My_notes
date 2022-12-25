@@ -3,13 +3,17 @@ package com.example.my_notes.ui.list;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.widget.Toast;
 
 import com.example.my_notes.domain.Callback;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.domain.NoteListView;
 import com.example.my_notes.domain.NotesRepository;
+import com.example.my_notes.ui.adapterItem.AdapterItem;
+import com.example.my_notes.ui.adapterItem.NoteItem;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -30,6 +34,7 @@ public class NotesListPresenter {
 
     public void upgradeNote(Note note) {
         repository.upgradeNote(note);
+        view.upgradeNote ( note );
     }
 
     public void addNote(Note note) {
@@ -49,20 +54,10 @@ public class NotesListPresenter {
         return repository.checkGroupForDbGroup ( text );
     }*/
 
-    public void deleteIndex(long group_id, List<Note> deleteNotes) {
-//        view.showProgress();
-        repository.deleteIndex (group_id, deleteNotes, new Callback<List<Note>> ( ) {
-            @Override
-            public void onSuccess(List<Note> result) {
-//                view.showNotes(result);
-//                view.hideProgress();
-            }
-
-            @Override
-            public void onError(Throwable error) {
-//                view.hideProgress();
-            }
-        } );
+    public void deleteIndex( List<Note> deleteNotes ) {
+        for (int i = 0; i < deleteNotes.size (); i++) {
+            repository.deleteIndex ( deleteNotes.get ( i ).getId ());
+        }
         view.deleteNotes ( deleteNotes );
     }
 
@@ -100,8 +95,8 @@ public class NotesListPresenter {
         return repository.getAllGroup ();
     }
 
-    public void addGroup(Group group) {
-        repository.addGroup ( group );
+    public Group addGroup(Group group) {
+        return repository.addGroup ( group );
     }
 
 /*    public List<Group> searchByGroupName(String folderName) {

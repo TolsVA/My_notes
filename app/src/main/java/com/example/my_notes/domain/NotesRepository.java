@@ -14,7 +14,7 @@ public interface NotesRepository {
 
     void clearDb();
 
-    void deleteIndex(long group_id, List<Note> deleteNotes, Callback<List<Note>> callback);
+    void deleteIndex( long index );
 
     void deleteIndexGroup(long index);
 
@@ -22,7 +22,7 @@ public interface NotesRepository {
 
     List<Note> searchDb(String text);
 
-    void addGroup(Group group);
+    Group addGroup(Group group);
 
     int checkGroupForDbGroup(String text);
 

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.my_notes.R;
+import com.example.my_notes.domain.Note;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -57,7 +58,46 @@ public class ItemsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public void addItems(int position, AdapterItem item) {
         this.items.add ( position, item );
-        items.size ( );
+    }
+
+    public int removeItem(AdapterItem item) {
+        int index = 0;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i) instanceof NoteItem) {
+                if (((NoteItem) items.get(i)).getNote().getId() == ((NoteItem)item).getNote ().getId() ) {
+                    index = i;
+                    break;
+                }
+            }
+            if (items.get(i) instanceof GroupItem) {
+                if (((GroupItem) items.get(i)).getGroup ().getId() == ((GroupItem)item).getGroup ().getId() ) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        items.remove(index);
+        return index;
+    }
+
+    public int upgradeItem(AdapterItem item) {
+        int index = 0;
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i) instanceof NoteItem) {
+                if (((NoteItem) items.get(i)).getNote().getId() == ((NoteItem)item).getNote ().getId() ) {
+                    index = i;
+                    break;
+                }
+            }
+            if (items.get(i) instanceof GroupItem) {
+                if (((GroupItem) items.get(i)).getGroup ().getId () == ((GroupItem)item).getGroup ().getId() ) {
+                    index = i;
+                    break;
+                }
+            }
+        }
+        items.set (index, item);
+        return index;
     }
 
     public int getPreviousClickedItemPosition() {

@@ -14,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.DialogFragment;
 import androidx.viewpager2.widget.ViewPager2;
+
 import com.example.my_notes.R;
 import com.example.my_notes.domain.Note;
 import com.example.my_notes.ui.adapter.MyAdapterIcon;
@@ -48,7 +49,7 @@ public class MyDialogFragmentImageView extends DialogFragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate ( savedInstanceState );
         if (getArguments ( ) != null) {
-            note = getArguments ().getParcelable ( ARG_NOTE );
+            note = getArguments ( ).getParcelable ( ARG_NOTE );
         }
         setCancelable ( false );
     }
@@ -57,38 +58,37 @@ public class MyDialogFragmentImageView extends DialogFragment {
     @NonNull
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
 
-        View customView = getLayoutInflater().inflate( R.layout.icon_name_group, null);
+        View customView = getLayoutInflater ( ).inflate ( R.layout.icon_name_group, null );
 
         imageView = customView.findViewById ( R.id.icon_choose );
         EditText editText = customView.findViewById ( R.id.folder_name );
 
-        icons = getResources().obtainTypedArray( R.array.coat_of_arms_images);
+        icons = getResources ( ).obtainTypedArray ( R.array.coat_of_arms_images );
         pager2 = customView.findViewById ( R.id.layout_image );
         pager2.setAdapter ( new MyAdapterIcon ( this, icons ) );
         pager2.setPageTransformer ( new ZoomOutPageTransformer ( ) );
-        savePosition();
+        savePosition ( );
 
-        return new AlertDialog.Builder(requireContext ())
-                .setView(customView)
-                .setPositiveButton("Создать папку", (dialogInterface, i) -> {
+        return new AlertDialog.Builder ( requireContext ( ) )
+                .setView ( customView )
+                .setPositiveButton ( "Создать папку", (dialogInterface, i) -> {
+
                     Activity activity = requireActivity ( );
                     if (activity instanceof DialogClickListener) {
                         groupId = ((DialogClickListener) activity).createNewGroup ( resourceId, String.valueOf ( editText.getText ( ) ) );
                         if (note != null) {
-                            note.setGroup_id ( groupId );
-                            Bundle bundle = new Bundle ( );
-                            if (note.getId () <= 0) {
-                                bundle.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
-                            } else {
-                                bundle.putParcelable ( NoteDetailFragment.ARG_NOTE, note );
-                            }
+                            Bundle data = new Bundle ( );
+                            data.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
+                            data.putInt ( NoteDetailFragment.ARG_NEW_ICON, resourceId );
+                            data.putString ( NoteDetailFragment.ARG_NEW_NAME_GROUP, editText.getText ( ).toString ( ) );
                             getParentFragmentManager ( )
-                                    .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, bundle );
+                                    .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, data );
                         }
                     }
+
                 } )
-                .setNeutralButton("Отмена", null)
-                .create();
+                .setNeutralButton ( "Отмена", null )
+                .create ( );
     }
 
     private void savePosition() {
@@ -102,7 +102,7 @@ public class MyDialogFragmentImageView extends DialogFragment {
             @Override
             public void onPageSelected(int position) {
                 super.onPageSelected ( position );
-                resourceId = icons.getResourceId ( position , 0 );
+                resourceId = icons.getResourceId ( position, 0 );
                 imageView.setImageResource ( resourceId );
             }
 

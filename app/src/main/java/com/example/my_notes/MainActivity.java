@@ -128,59 +128,59 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
             savePosition ( );
         }
 
-        getSupportFragmentManager ( )
-                .setFragmentResultListener ( ConstantsNote.KEY_RESULT, this, (requestKey, result) -> {
-                    note = result.getParcelable ( ConstantsNote.ARG_NOTE );
-                    Toast.makeText ( MainActivity.this, note.getTitle ( ), Toast.LENGTH_SHORT ).show ( );
-                    group_id = note.getGroup_id ( );
-                    showNotesList ( note );
-                } );
+//        getSupportFragmentManager ( )
+//                .setFragmentResultListener ( ConstantsNote.KEY_RESULT, this, (requestKey, result) -> {
+//                    note = result.getParcelable ( ConstantsNote.ARG_NOTE );
+//                    Toast.makeText ( MainActivity.this, note.getTitle ( ), Toast.LENGTH_SHORT ).show ( );
+//                    group_id = note.getGroup_id ( );
+//                    showNotesList ( note );
+//                } );
 
-        getSupportFragmentManager ( )
-                .setFragmentResultListener ( NotesListFragment.RESULT_KEY, this, (requestKey, result) -> {
-                    note = result.getParcelable ( NotesListFragment.ARG_NOTE );
-                    notes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
-                    indexPrev = index;
-                    index = result.getInt ( NotesListFragment.ARG_INDEX );
-
-                    Toast.makeText ( this, note.getTitle (), Toast.LENGTH_SHORT ).show ( );
-                    setGroupId ( note.getGroup_id () );
-//                    index = notes.indexOf ( note );
-
-                    if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
-//                        fab.setVisibility ( View.VISIBLE );
-//                        fab.setClickable ( true );
-                        pager.setCurrentItem ( index, false );
-                    } else {
-                        fab.setVisibility ( View.GONE );
-
-                        Fragment fmList = getSupportFragmentManager ( )
-                                .findFragmentByTag ( NotesListFragment.TAG );
-
-                        if (fmList != null) {
-                            getSupportFragmentManager ( )
-                                    .beginTransaction ( )
-                                    .addToBackStack ( "" )
-//                                    .hide ( fmList )
-                                    .add ( R.id.fragment_container, NoteDetailFragment.newInstance ( note ), NoteDetailFragment.TAG )
-                                    .commit ( );
-                        }
+//        getSupportFragmentManager ( )
+//                .setFragmentResultListener ( NotesListFragment.RESULT_KEY, this, (requestKey, result) -> {
+//                    note = result.getParcelable ( NotesListFragment.ARG_NOTE );
+//                    notes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
+//                    indexPrev = index;
+//                    index = result.getInt ( NotesListFragment.ARG_INDEX );
 //
-//                        itemView = LayoutInflater.from ( MainActivity.this )
-//                                .inflate ( R.layout.view_pager2, coordinatorLayout, false );
+//                    Toast.makeText ( this, note.getTitle (), Toast.LENGTH_SHORT ).show ( );
+//                    setGroupId ( note.getGroup_id () );
+////                    index = notes.indexOf ( note );
 //
-//                        pager = itemView.findViewById ( R.id.fragment_container_detail );
+//                    if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
+////                        fab.setVisibility ( View.VISIBLE );
+////                        fab.setClickable ( true );
+//                        pager.setCurrentItem ( index, false );
+//                    } else {
+//                        fab.setVisibility ( View.GONE );
 //
-//                        showDetails ( );
+//                        Fragment fmList = getSupportFragmentManager ( )
+//                                .findFragmentByTag ( NotesListFragment.TAG );
 //
-//                        savePosition ( );
-//
-//                        if (index > 0) {
-//                            selectPosition ( );
+//                        if (fmList != null) {
+//                            getSupportFragmentManager ( )
+//                                    .beginTransaction ( )
+//                                    .addToBackStack ( "" )
+////                                    .hide ( fmList )
+//                                    .add ( R.id.fragment_container, NoteDetailFragment.newInstance ( note ), NoteDetailFragment.TAG )
+//                                    .commit ( );
 //                        }
-//                        coordinatorLayout.addView ( itemView );
-                    }
-                } );
+////
+////                        itemView = LayoutInflater.from ( MainActivity.this )
+////                                .inflate ( R.layout.view_pager2, coordinatorLayout, false );
+////
+////                        pager = itemView.findViewById ( R.id.fragment_container_detail );
+////
+////                        showDetails ( );
+////
+////                        savePosition ( );
+////
+////                        if (index > 0) {
+////                            selectPosition ( );
+////                        }
+////                        coordinatorLayout.addView ( itemView );
+//                    }
+//                } );
 
 //        getSupportFragmentManager ( )
 //                .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
@@ -188,14 +188,14 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
 //                    showNotesList ( note );
 //                } );
 
-        getSupportFragmentManager ( )
-                .setFragmentResultListener ( NotesListFragment.CREATE_DELETE_KEY, this, (requestKey, result) -> {
-                    deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
-//                    FragmentManager fm = getSupportFragmentManager ( );
-                    fm.beginTransaction ( )
-                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                            .commit ( );
-                } );
+//        getSupportFragmentManager ( )
+//                .setFragmentResultListener ( NotesListFragment.CREATE_DELETE_KEY, this, (requestKey, result) -> {
+//                    deleteNotes = result.getParcelableArrayList ( NotesListFragment.ARG_NOTES );
+////                    FragmentManager fm = getSupportFragmentManager ( );
+//                    fm.beginTransaction ( )
+//                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes), NotesListFragment.TAG )
+//                            .commit ( );
+//                } );
 
 //        getSupportFragmentManager ( )
 //                .setFragmentResultListener ( NotesListFragment.DELETE_NOTE_KEY, this, (requestKey, result) -> {
@@ -224,8 +224,8 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
 
                 } );
 
-        getSupportFragmentManager ( )
-                .setFragmentResultListener ( NotesListFragment.SHOW_ALL_NOTES, this, (requestKey, result) -> showAllNotes () );
+//        getSupportFragmentManager ( )
+//                .setFragmentResultListener ( NotesListFragment.SHOW_ALL_NOTES, this, (requestKey, result) -> showAllNotes () );
     }
 
     private void showNotesList(Note note) {
@@ -308,23 +308,6 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     }
 
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    private void selectPosition() {
-
-/*        NestedScrollView scrollView = findViewById ( R.id.scroll_list );
-        LinearLayoutCompat notesContainer = findViewById ( R.id.container_notes );
-
-        if (notes.size ( ) > 0) {
-            scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
-            notesContainer.getChildAt ( index ).setBackground ( getDrawable ( R.drawable.layout_bg_2 ) );
-        }
-
-        if (indexPrev >= 0 && index != indexPrev) {
-            notesContainer.getChildAt ( indexPrev )
-                    .setBackground ( getDrawable ( R.drawable.layout_bg ) );
-        }*/
-    }
-
     private FragmentStateAdapter changeContent(List<Note> _notes) {
         return new MyAdapter ( MainActivity.this, _notes );
     }
@@ -350,9 +333,6 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
                     indexPrev = index;
                     index = position;
                 }
-
-                Toast.makeText ( MainActivity.this, "Position pager = " + position, Toast.LENGTH_SHORT ).show ( );
-                selectPosition ( );
             }
 
             @Override
@@ -365,7 +345,7 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     @Override
     public void onBackPressed() {
         Toast.makeText ( this, "рас", Toast.LENGTH_SHORT ).show ( );
-
+        Toast.makeText ( this, "MainActivity", Toast.LENGTH_SHORT ).show ( );
 
         Fragment fmList = getSupportFragmentManager ( )
                 .findFragmentByTag ( NoteDetailFragment.TAG );
@@ -392,7 +372,7 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
         super.onBackPressed ( );
     }
 
-    public void fabEventHandling(FloatingActionButton fab) {
+    public void fabEventHandling(FloatingActionButton fab, long group_id) {
         this.fab = fab;
         fab.setOnClickListener ( view -> {
             fab.setVisibility ( View.GONE );
@@ -415,42 +395,16 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
                         .add ( R.id.fragment_container, NoteDetailFragment.newInstance ( newNote ), NoteDetailFragment.TAG )
                         .commit ( );
             }
-            selectPosition ( );
         } );
     }
 
-    public long getGroupId() {
-        return group_id;
-    }
 
     public void setGroupId(long group_id) {
         this.group_id = group_id;
     }
 
-//    public List<Note> getNotes() {
-//        return presenter.refreshNotes ( group_id );
-//    }
 
-    public String getGroupName() {
-        groups = presenter.refreshGroup ( );
-        if (groups.size () == 0) {
-            group_id = -1;
-        }
-        String groupName = null;
-        if (group_id > 0) {
-            for (Group group : groups) {
-                if (group.getId ( ) == group_id) {
-                    groupName = group.getName ( );
-                }
-            }
-        } else if (group_id == 0) {
-            groupName = "Все заметки";
 
-        } else {
-            groupName = getResources ( ).getString ( R.string.you_have_no_notes );
-        }
-        return groupName;
-    }
 
     public List<Note> searchNote(String newText) {
         return presenter.search ( newText );
@@ -472,7 +426,7 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
         FragmentManager fm = getSupportFragmentManager ( );
         fm.popBackStack ( );
         fm.beginTransaction ( )
-                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+                .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes), NotesListFragment.TAG )
                 .commit ( );
         if (getResources ( ).getConfiguration ( ).orientation == Configuration.ORIENTATION_LANDSCAPE) {
             showDetails ( );
@@ -487,6 +441,28 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
             presenter.deleteIndexGroup ( position );
         }
         showAllNotes ();
+    }
+////
+    public String getGroupName(long id) {
+        group_id = id;
+        groups = presenter.refreshGroup ( );
+        if (groups.size () == 0) {
+            group_id = -1;
+        }
+        String groupName = null;
+        if (group_id > 0) {
+            for (Group group : groups) {
+                if (group.getId ( ) == group_id) {
+                    groupName = group.getName ( );
+                }
+            }
+        } else if (group_id == 0) {
+            groupName = "Все заметки";
+
+        } else {
+            groupName = getResources ( ).getString ( R.string.you_have_no_notes );
+        }
+        return groupName;
     }
 
     @Override
@@ -524,6 +500,5 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     public void getPresenter(NotesListPresenter presenter) {
         this.presenter = presenter;
         presenter.refreshNotes ( group_id );
-//        Toast.makeText ( this, String.valueOf ( notes.size () ), Toast.LENGTH_SHORT ).show ( );
     }
 }

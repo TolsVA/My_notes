@@ -36,11 +36,15 @@ public class NoteDetailFragment extends Fragment {
 
     public static final String TAG = "NoteDetailFragment";
 
-    public static final String ARG_NOTE = "NoteDetailFragmentARG_NOTE";
+    public static final String ARG_NOTE = "NoteDetailFragment_ARG_NOTE";
 
-    public static final String ARG_NEW_NOTE = "ARG_NEW_NOTE";
+    public static final String ARG_NEW_NOTE = "NoteDetailFragment_ARG_NEW_NOTE";
+
+    public static final String ARG_NEW_ICON = "NoteDetailFragment_ARG_NEW_ICON";
 
     public static final String RESULT_KEY_DETAIL_FRAGMENT = "NoteDetailFragment_RESULT_KEY_DETAIL_FRAGMENT";
+
+    public static final String ARG_NEW_NAME_GROUP = "ARG_NEW_NAME_GROUP";
 
     private Note note;
 
@@ -93,7 +97,7 @@ public class NoteDetailFragment extends Fragment {
             createBottomNavigation ( );
 
             toolbar.setVisibility ( View.VISIBLE );
-            toolbar.setTitle ( ((MainActivity) requireActivity ( )).getGroupName ( ) );
+            toolbar.setTitle ( ((MainActivity) requireActivity ( )).getGroupName ( note.getGroup_id ()) );
             toolbarItemClick ( );
         } else {
             bottomNavigationView.setVisibility ( View.GONE );
@@ -187,13 +191,10 @@ public class NoteDetailFragment extends Fragment {
                                     int iconResourceId = R.drawable.ic_baseline_folder_24;
                                     String name = getString ( R.string.uncategorized );
 
-                                    groupId = ((DialogClickListener) activity).createNewGroup ( iconResourceId, name );
-
-                                    note.setGroup_id ( groupId );
-
                                     Bundle data = new Bundle ( );
                                     data.putParcelable ( ARG_NEW_NOTE, note );
-
+                                    data.putInt ( ARG_NEW_ICON, iconResourceId);
+                                    data.putString ( ARG_NEW_NAME_GROUP, name );
                                     getParentFragmentManager ( )
                                             .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
                                     return true;
@@ -207,21 +208,15 @@ public class NoteDetailFragment extends Fragment {
                         } );
                         popupMenu.show ( );
                     } else {
-                        Bundle bundle = new Bundle ( );
-                        if (note.getId () <= 0) {
-                            groupId = ((DialogClickListener) activity).getGroupId ();
-                            note.setGroup_id ( groupId );
-                            bundle.putParcelable ( NoteDetailFragment.ARG_NEW_NOTE, note );
-                        } else {
-                            bundle.putParcelable ( NoteDetailFragment.ARG_NOTE, note );
-                        }
+                        Bundle data = new Bundle ( );
+                        data.putParcelable ( ARG_NEW_NOTE, note );
                         getParentFragmentManager ( )
-                                .setFragmentResult ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, bundle );
+                                .setFragmentResult ( RESULT_KEY_DETAIL_FRAGMENT, data );
                     }
                     return true;
                 case R.id.save_as:
                     activity = getActivity ();
-                    List<Group> groups = null;
+                    List<Group> groups = new ArrayList<> ();
                     if (activity != null) {
                         groups = ((DialogClickListener) activity).getGroups ( );
                     }

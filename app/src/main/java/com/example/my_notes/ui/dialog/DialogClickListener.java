@@ -14,5 +14,4 @@ public interface DialogClickListener {
 
     List<Group> getGroups();
 
-    long getGroupId();
 }

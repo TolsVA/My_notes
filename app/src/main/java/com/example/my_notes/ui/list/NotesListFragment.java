@@ -29,6 +29,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -189,34 +190,28 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
         getParentFragmentManager ()
                 .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
-                    note = result.getParcelable ( NoteDetailFragment.ARG_NOTE );
-
-                    removeNoteDetailFragment();
-
-                    presenter.upgradeNote ( note );
-
-                    if (group_id != note.getGroup_id ( )) {
-                        group_id = note.getGroup_id ( );
-                        presenter.refreshNotes ( group_id );
-                    }
-
-                    toolbar.setTitle ( getGroupName () );
-                } );
-
-        getParentFragmentManager ()
-                .setFragmentResultListener ( NoteDetailFragment.RESULT_KEY_DETAIL_FRAGMENT, this, (requestKey, result) -> {
                     note = result.getParcelable ( NoteDetailFragment.ARG_NEW_NOTE );
+                    int iconGroup = result.getInt ( NoteDetailFragment.ARG_NEW_ICON );
+                    String nameGroup = result.getString ( NoteDetailFragment.ARG_NEW_NAME_GROUP );
 
                     removeNoteDetailFragment();
 
-                    presenter.addNote ( note );
+                    if (iconGroup != 0 && nameGroup != null) {
+                        newGroup = new Group ( -1, nameGroup, iconGroup, 0 );
+                        group = presenter.addGroup ( newGroup );
+                        note.setGroup_id ( group.getId () );
+                    }
 
                     if (group_id != note.getGroup_id ()) {
                         group_id = note.getGroup_id ();
                         presenter.refreshNotes ( group_id );
                     }
 
-                    presenter.refreshNotes ( group_id );
+                    if (note.getId () <= 0) {
+                        presenter.addNote ( note );
+                    } else {
+                        presenter.upgradeNote ( note );
+                    }
 
                     toolbar.setTitle ( getGroupName () );
                 } );
@@ -265,6 +260,11 @@ public class NotesListFragment extends Fragment implements NoteListView {
 //        notesList.setLayoutManager ( new GridLayoutManager ( requireContext (), 2 ) );
         notesList.setAdapter ( adapter );
 
+        DefaultItemAnimator animator = new DefaultItemAnimator ();
+        animator.setAddDuration ( 500 );
+        animator.setRemoveDuration ( 500 );
+        notesList.setItemAnimator ( animator );
+
         adapterItems = new ArrayList<> ();
 
         if (savedInstanceState == null) {
@@ -274,43 +274,7 @@ public class NotesListFragment extends Fragment implements NoteListView {
             ((MainActivity) activity).getPresenter ( presenter );
         }
 
-
-
-//        showNotes ( notes );
-
-/*        NestedScrollView scrollView = view.findViewById ( R.id.scroll_list );
-
-        scrollView.requestChildFocus ( notesContainer, notesContainer.getChildAt ( index ) );
-
-        if (notes.size ( ) != 0 && index >= 0) {
-            notesContainer.getChildAt ( index ).setBackground ( getResources ( ).getDrawable ( R.drawable.layout_bg_2, requireContext ( ).getTheme ( ) ) );
-        }*/
     }
-
-/*    private void savePosition() {
-        this.pager2.registerOnPageChangeCallback ( new ViewPager2.OnPageChangeCallback ( ) {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                super.onPageScrolled ( position, positionOffset, positionOffsetPixels );
-            }
-
-            @SuppressLint("UseCompatLoadingForDrawables")
-            @Override
-            public void onPageSelected(int position) {
-                super.onPageSelected ( position );
-                groups = ((MainActivity) requireActivity ( )).getGroups ();
-                long group_id = groups.get ( position ).getId ();
-                ((MainActivity) requireActivity ( )).setGroupId(group_id);
-                notes = ((MainActivity) requireActivity ( )).getNotes();
-                showNotes ( notes );
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                super.onPageScrollStateChanged ( state );
-            }
-        } );
-    }*/
 
     @SuppressLint("NonConstantResourceId")
     private void toolbarItemClick() {
@@ -408,7 +372,6 @@ public class NotesListFragment extends Fragment implements NoteListView {
     @SuppressLint("NotifyDataSetChanged")
     public void showNotes(List<Note> notes) {
         this.notes = notes;
-
         adapterItems = castToType(notes);
 
         adapter.setItems ( adapterItems );
@@ -421,25 +384,7 @@ public class NotesListFragment extends Fragment implements NoteListView {
             createNavView ( navigationView );
             toolbarItemClick(); // Проверить
 
-/*            pager2 = view.findViewById ( R.id.pager_group );
-            groups = ((MainActivity) requireActivity ( )).getGroups ();
-            pager2.setAdapter ( new MyAdapterGroup ( requireActivity (), groups ) );
-            pager2.setPageTransformer ( new ZoomOutPageTransformer ( ) );
-
-            long groupId = ((MainActivity) requireActivity ( )).getGroupId();
-            pager2.setCurrentItem ( (int) groupId, false );
-
-            savePosition ( );*/
-
-            ((MainActivity) requireActivity ( )).fabEventHandling ( fab );
-        }
-
-
-
-        if (getResources ( ).getConfiguration ( ).orientation != Configuration.ORIENTATION_LANDSCAPE) {
-//            Activity activity = requireActivity ();
-//            String groupName = ((MainActivity) activity).getGroupName ( );
-//            setTitleToolbar ( groupName );
+            ((MainActivity) requireActivity ( )).fabEventHandling ( fab, group_id );
 
             toolbar.setTitle ( getGroupName () );
 
@@ -464,13 +409,18 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
     @Override
     public void upgradeNote(Note note) {
-
+        int position = adapter.upgradeItem(new NoteItem (note));
+        adapter.notifyItemChanged(position);
+//        notesList.scrollToPosition ( position );
     }
 
     @Override
     public void deleteNotes(List<Note> deleteNotes) {
-        adapter.addItems ( position, new NoteItem ( note ) );
-        deleteNotes.remove (  )
+        for (int i = 0; i < deleteNotes.size (); i++) {
+            int position = adapter.removeItem(new NoteItem (deleteNotes.get ( i )));
+            adapter.notifyItemRemoved ( position );
+//            notesList.scrollToPosition ( position );
+        }
     }
 
     @Override
@@ -488,13 +438,17 @@ public class NotesListFragment extends Fragment implements NoteListView {
                 previousClickedItemPosition = position;
                 adapter.notifyDataSetChanged ();
 
-                Bundle data = new Bundle ( );
-                data.putParcelable ( ARG_NOTE, note.getNote () );
-                data.putInt ( ARG_INDEX, position );
-                data.putParcelableArrayList ( ARG_NOTES, (ArrayList<? extends Parcelable>) notes );
+                Fragment fmList = getParentFragmentManager ( )
+                        .findFragmentByTag ( NotesListFragment.TAG );
 
-                getParentFragmentManager ( )
-                        .setFragmentResult ( RESULT_KEY, data );
+                FragmentManager fmDetail = getParentFragmentManager ( );
+
+                assert fmList != null;
+                fmDetail.beginTransaction ( )
+                        .hide ( fmList )
+                        .addToBackStack ( "" )
+                        .add ( R.id.fragment_container, NoteDetailFragment.newInstance ( note.getNote () ), NoteDetailFragment.TAG )
+                        .commit ( );
             }
         } );
 
@@ -526,11 +480,6 @@ public class NotesListFragment extends Fragment implements NoteListView {
         }
     }
 
-
-    public void setTitleToolbar(String groupName) {
-        toolbar.setTitle ( groupName );
-    }
-
     @SuppressLint("NonConstantResourceId")
     private void createBottomNavigation() {
         MenuItem menuItem = bottomNavigationView.getMenu ( ).getItem ( 0 );
@@ -545,14 +494,19 @@ public class NotesListFragment extends Fragment implements NoteListView {
                     Toast.makeText ( requireContext ( ), "Здесь что-то будет", Toast.LENGTH_SHORT ).show ( );
                     return true;
                 case R.id.delete_selected_notes:
-                    presenter.deleteIndex ( group_id, deleteNotes );
+                    presenter.deleteIndex ( deleteNotes );
                     deleteNotes.clear ( );
+                    fab.setVisibility ( View.VISIBLE );
+                    bottomNavigationView.setVisibility ( View.GONE );
+                    layoutToolbar.setVisibility ( View.GONE );
+
+
 //                    notes = presenter.refreshNotes ( group_id );
-                    index = 0;
+//                    index = 0;
 //                    FragmentManager fm = getSupportFragmentManager ( );
-                    fm.beginTransaction ( )
-                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
-                            .commit ( );
+//                    fm.beginTransaction ( )
+//                            .replace ( R.id.fragment_container, NotesListFragment.newInstance ( notes, index, deleteNotes ), NotesListFragment.TAG )
+//                            .commit ( );
                     return true;
             }
             return false;
