@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import com.example.my_notes.db.DbManager;
@@ -38,7 +37,12 @@ public class InMemoryRepository implements NotesRepository {
                 e.printStackTrace();
             }
 
-            handler.post( () -> callback.onSuccess(dbManager.getFromDb(group_id)) );
+            handler.post( new Runnable ( ) {
+                @Override
+                public void run() {
+                    callback.onSuccess ( dbManager.getFromDb ( group_id ) );
+                }
+            } );
         } );
     }
 
@@ -48,8 +52,8 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
-    public void addNote(Note note) {
-        dbManager.insertToDbNote ( note );
+    public Note addNote(Note note) {
+        return dbManager.insertToDbNote ( note );
     }
 
     @Override

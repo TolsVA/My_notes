@@ -37,9 +37,14 @@ public class NotesListPresenter {
         view.upgradeNote ( note );
     }
 
-    public void addNote(Note note) {
-        repository.addNote ( note );
-        view.addNote ( note );
+//    public void addNote(Note note) {
+//        repository.addNote ( note );
+//        view.addNote ( note );
+//    }
+
+    public Note addNote(Note note) {
+        Note newNote = repository.addNote ( note );
+        return newNote;
     }
 
     public void clearDb(){

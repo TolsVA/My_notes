@@ -10,7 +10,7 @@ public interface NotesRepository {
 
     void upgradeNote(Note note);
 
-    void addNote(Note note);
+    Note addNote(Note note);
 
     void clearDb();
 

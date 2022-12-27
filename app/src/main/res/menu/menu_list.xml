@@ -25,6 +25,11 @@
             android:title="@string/load_notes"
             app:showAsAction="never">
         </item>
+        <item
+            android:id="@+id/load_notes_fir"
+            android:title="@string/load_notes_fir"
+            app:showAsAction="never">
+        </item>
     </group>
 
 </menu>

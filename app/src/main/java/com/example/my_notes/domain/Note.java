@@ -3,6 +3,8 @@ package com.example.my_notes.domain;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.Date;
+
 public class Note implements Parcelable {
 
     private long id;

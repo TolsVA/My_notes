@@ -38,6 +38,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
+import com.example.my_notes.domain.FirestormNotesPresenter;
+import com.example.my_notes.domain.FirestormNotesRepository;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
@@ -124,6 +126,9 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
     private NotesListPresenter presenter;
 
+    private FirestormNotesPresenter presenterFir;
+
+
     private ProgressBar progress;
 
     public ViewPager2 pager;
@@ -208,7 +213,8 @@ public class NotesListFragment extends Fragment implements NoteListView {
                     }
 
                     if (note.getId () <= 0) {
-                        presenter.addNote ( note );
+                        Note newNote = presenter.addNote ( note );
+                        presenterFir.addNote ( newNote );
                     } else {
                         presenter.upgradeNote ( note );
                     }
@@ -269,9 +275,10 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
         if (savedInstanceState == null) {
             presenter = new NotesListPresenter ( requireContext ( ), new InMemoryRepository ( requireContext ( ) ), this );
+            presenterFir = new FirestormNotesPresenter (FirestormNotesRepository.INSTANCE, this);
 
             Activity activity = requireActivity ( );
-            ((MainActivity) activity).getPresenter ( presenter );
+            ((MainActivity) activity).getPresenter ( presenter, presenterFir );
         }
 
     }
@@ -310,6 +317,9 @@ public class NotesListFragment extends Fragment implements NoteListView {
                 case R.id.load_notes:
                     ((MainActivity)requireActivity ()).setGroupId ( 0 );
 //                    showNotes ( ((MainActivity)requireActivity ()).getNotes () );
+                    return true;
+                case R.id.load_notes_fir:
+                    presenterFir.getAll();
                     return true;
                 default:
                     return false;
@@ -386,7 +396,7 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
             ((MainActivity) requireActivity ( )).fabEventHandling ( fab, group_id );
 
-            toolbar.setTitle ( getGroupName () );
+//            toolbar.setTitle ( getGroupName () );
 
             if (deleteNotes.size ( ) > 0) {
                 createBottomNavigation ( );
