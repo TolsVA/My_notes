@@ -37,9 +37,14 @@ public class NotesListPresenter {
         view.upgradeNote ( note );
     }
 
-    public void addNote(Note note) {
-        repository.addNote ( note );
-        view.addNote ( note );
+//    public void addNote(Note note) {
+//        repository.addNote ( note );
+//        view.addNote ( note );
+//    }
+
+    public Note addNote(Note note) {
+        Note newNote = repository.addNote ( note );
+        return newNote;
     }
 
     public void clearDb(){
@@ -55,10 +60,10 @@ public class NotesListPresenter {
     }*/
 
     public void deleteIndex( List<Note> deleteNotes ) {
-//        for (int i = 0; i < deleteNotes.size (); i++) {
-//            repository.deleteIndex ( deleteNotes.get ( i ).getId ());
-//        }
-//        view.deleteNotes ( deleteNotes );
+        for (int i = 0; i < deleteNotes.size (); i++) {
+            repository.deleteIndex ( deleteNotes.get ( i ).getId ());
+        }
+        view.deleteNotes ( deleteNotes );
     }
 
     public void deleteIndexGroup(long index) {

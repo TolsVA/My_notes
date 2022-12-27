@@ -12,17 +12,13 @@ import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.my_notes.domain.FirestormNotesPresenter;
 import com.example.my_notes.domain.Group;
-import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
-import com.example.my_notes.domain.NoteListView;
-import com.example.my_notes.domain.NotesRepository;
 import com.example.my_notes.ui.adapter.MyAdapter;
 import com.example.my_notes.ui.adapter.ZoomOutPageTransformer;
 import com.example.my_notes.ui.dialog.ConstantsNote;
@@ -36,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements DialogClickListener {
 
@@ -72,6 +67,8 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
     public List<Note> deleteNotes;
 
     private NotesListPresenter presenter;
+
+    private FirestormNotesPresenter presenterFir;
 
 //    private ProgressBar progress;
 
@@ -497,8 +494,10 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
         return presenter.refreshGroup ( );
     }
 
-    public void getPresenter(NotesListPresenter presenter) {
+    public void getPresenter(NotesListPresenter presenter, FirestormNotesPresenter presenterFir) {
         this.presenter = presenter;
-        presenter.refreshNotes ( group_id );
+        this.presenterFir = presenterFir;
+        presenterFir.getAll ();
+//        presenter.refreshNotes ( group_id );
     }
 }

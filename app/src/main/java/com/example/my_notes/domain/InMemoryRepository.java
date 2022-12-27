@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import com.example.my_notes.db.DbManager;
@@ -53,8 +52,8 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
-    public void addNote(Note note) {
-        dbManager.insertToDbNote ( note );
+    public Note addNote(Note note) {
+        return dbManager.insertToDbNote ( note );
     }
 
     @Override

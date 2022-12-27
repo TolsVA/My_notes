@@ -26,4 +26,20 @@ public class FirestormNotesPresenter {
             }
         } );
     }
+
+    public void getAll() {
+        view.showProgress ();
+        repository.getAll ( new Callback<List<Note>> ( ) {
+            @Override
+            public void onSuccess(List<Note> result) {
+                view.hideProgress ();
+                view.showNotes ( result );
+            }
+
+            @Override
+            public void onError(Throwable error) {
+
+            }
+        } );
+    }
 }

@@ -213,8 +213,8 @@ public class NotesListFragment extends Fragment implements NoteListView {
                     }
 
                     if (note.getId () <= 0) {
-//                        presenter.addNote ( note );
-                        presenterFir.addNote ( note );
+                        Note newNote = presenter.addNote ( note );
+                        presenterFir.addNote ( newNote );
                     } else {
                         presenter.upgradeNote ( note );
                     }
@@ -278,7 +278,7 @@ public class NotesListFragment extends Fragment implements NoteListView {
             presenterFir = new FirestormNotesPresenter (FirestormNotesRepository.INSTANCE, this);
 
             Activity activity = requireActivity ( );
-            ((MainActivity) activity).getPresenter ( presenter );
+            ((MainActivity) activity).getPresenter ( presenter, presenterFir );
         }
 
     }
@@ -317,6 +317,9 @@ public class NotesListFragment extends Fragment implements NoteListView {
                 case R.id.load_notes:
                     ((MainActivity)requireActivity ()).setGroupId ( 0 );
 //                    showNotes ( ((MainActivity)requireActivity ()).getNotes () );
+                    return true;
+                case R.id.load_notes_fir:
+                    presenterFir.getAll();
                     return true;
                 default:
                     return false;
@@ -393,7 +396,7 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
             ((MainActivity) requireActivity ( )).fabEventHandling ( fab, group_id );
 
-            toolbar.setTitle ( getGroupName () );
+//            toolbar.setTitle ( getGroupName () );
 
             if (deleteNotes.size ( ) > 0) {
                 createBottomNavigation ( );

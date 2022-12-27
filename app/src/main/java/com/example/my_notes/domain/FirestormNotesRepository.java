@@ -5,12 +5,16 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class FirestormNotesRepository implements FirestormRepository {
 
@@ -33,13 +37,11 @@ public class FirestormNotesRepository implements FirestormRepository {
 
         Date createdAt = new Date();
 
-        note.setId ( 1 ); // Заглушка
-
         data.put( KEY_ID, note.getId () );
         data.put( KEY_TITLE, note.getTitle () );
         data.put( KEY_TEXT, note.getText () );
         data.put( KEY_DATA, String.valueOf ( createdAt ) );
-        data.put( KEY_GROUP_IG, String.valueOf ( note.getGroup_id () ) );
+        data.put( KEY_GROUP_IG, note.getGroup_id () );
 
         db.collection(NOTES)
                 .add(data)
@@ -57,6 +59,40 @@ public class FirestormNotesRepository implements FirestormRepository {
                     @Override
                     public void onFailure(@NonNull Exception e) {
 //                        callback.onError(e);
+                    }
+                });
+    }
+
+    @Override
+    public void getAll(Callback<List<Note>> callback) {
+        db.collection(NOTES)
+                .get()
+                .addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> documents = queryDocumentSnapshots.getDocuments();
+
+                        ArrayList<Note> result = new ArrayList<>();
+
+                        for (DocumentSnapshot snapshot: documents) {
+//                            String id = snapshot.getId();
+                            long id = snapshot.getLong ( KEY_ID );
+                            String title = snapshot.getString(KEY_TITLE);
+                            String text = snapshot.getString(KEY_TEXT);
+                            String date = snapshot.getString (KEY_DATA);
+                            long group_id = snapshot.getLong ( KEY_GROUP_IG );
+
+                            result.add(new Note(id, title, text, date, group_id));
+                        }
+
+                        callback.onSuccess(result);
+
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        callback.onError(e);
                     }
                 });
     }
