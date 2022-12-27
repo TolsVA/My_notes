@@ -38,6 +38,8 @@ import androidx.viewpager2.widget.ViewPager2;
 
 import com.example.my_notes.MainActivity;
 import com.example.my_notes.R;
+import com.example.my_notes.domain.FirestormNotesPresenter;
+import com.example.my_notes.domain.FirestormNotesRepository;
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.InMemoryRepository;
 import com.example.my_notes.domain.Note;
@@ -124,6 +126,9 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
     private NotesListPresenter presenter;
 
+    private FirestormNotesPresenter presenterFir;
+
+
     private ProgressBar progress;
 
     public ViewPager2 pager;
@@ -208,7 +213,8 @@ public class NotesListFragment extends Fragment implements NoteListView {
                     }
 
                     if (note.getId () <= 0) {
-                        presenter.addNote ( note );
+//                        presenter.addNote ( note );
+                        presenterFir.addNote ( note );
                     } else {
                         presenter.upgradeNote ( note );
                     }
@@ -269,6 +275,7 @@ public class NotesListFragment extends Fragment implements NoteListView {
 
         if (savedInstanceState == null) {
             presenter = new NotesListPresenter ( requireContext ( ), new InMemoryRepository ( requireContext ( ) ), this );
+            presenterFir = new FirestormNotesPresenter (FirestormNotesRepository.INSTANCE, this);
 
             Activity activity = requireActivity ( );
             ((MainActivity) activity).getPresenter ( presenter );

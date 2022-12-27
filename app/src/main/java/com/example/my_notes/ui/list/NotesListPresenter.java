@@ -55,10 +55,10 @@ public class NotesListPresenter {
     }*/
 
     public void deleteIndex( List<Note> deleteNotes ) {
-        for (int i = 0; i < deleteNotes.size (); i++) {
-            repository.deleteIndex ( deleteNotes.get ( i ).getId ());
-        }
-        view.deleteNotes ( deleteNotes );
+//        for (int i = 0; i < deleteNotes.size (); i++) {
+//            repository.deleteIndex ( deleteNotes.get ( i ).getId ());
+//        }
+//        view.deleteNotes ( deleteNotes );
     }
 
     public void deleteIndexGroup(long index) {

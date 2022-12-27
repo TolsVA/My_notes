@@ -38,7 +38,12 @@ public class InMemoryRepository implements NotesRepository {
                 e.printStackTrace();
             }
 
-            handler.post( () -> callback.onSuccess(dbManager.getFromDb(group_id)) );
+            handler.post( new Runnable ( ) {
+                @Override
+                public void run() {
+                    callback.onSuccess ( dbManager.getFromDb ( group_id ) );
+                }
+            } );
         } );
     }
 
