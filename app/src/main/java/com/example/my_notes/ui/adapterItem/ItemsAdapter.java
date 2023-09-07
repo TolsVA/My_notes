@@ -8,7 +8,6 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.my_notes.R;
-import com.example.my_notes.domain.Note;
 
 import java.util.ArrayList;
 import java.util.Collection;

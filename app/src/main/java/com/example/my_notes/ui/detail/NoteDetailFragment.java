@@ -4,7 +4,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,8 +56,6 @@ public class NoteDetailFragment extends Fragment {
     public Toolbar toolbar;
 
     public BottomNavigationView bottomNavigationView;
-
-    private long groupId;
 
     public List<String> list;
 

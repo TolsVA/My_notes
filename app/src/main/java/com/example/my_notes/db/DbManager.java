@@ -4,9 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
 
 import com.example.my_notes.domain.Group;
 import com.example.my_notes.domain.Note;
@@ -117,7 +114,6 @@ public class DbManager {
         dbHelper.close();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     public List<Note> searchDb(String _text) {
 
         String sql = "SELECT * FROM " + Constants.FeedEntryNote.TABLE_NOTE + " WHERE " +

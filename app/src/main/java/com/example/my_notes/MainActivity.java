@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements DialogClickListen
         pager = findViewById ( R.id.fragment_container_detail );
 
 //        notes = presenter.refreshNotes ( group_id );
-
+ 
         notes = new ArrayList<> ();
 
         FragmentManager fm = getSupportFragmentManager ( );
