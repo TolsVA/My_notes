@@ -1,12 +1,8 @@
 package com.example.my_notes.domain;
 
 import android.content.Context;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.widget.Toast;
-
-import androidx.annotation.RequiresApi;
 import com.example.my_notes.db.DbManager;
 
 import java.util.List;
@@ -21,12 +17,9 @@ public class InMemoryRepository implements NotesRepository {
 
     private final DbManager dbManager;
 
-    private  Context context;
-
     public InMemoryRepository(Context context) {
         dbManager = new DbManager(context);
         dbManager.openDb();
-        this.context = context;
     }
 
     @Override
@@ -38,7 +31,12 @@ public class InMemoryRepository implements NotesRepository {
                 e.printStackTrace();
             }
 
-            handler.post( () -> callback.onSuccess(dbManager.getFromDb(group_id)) );
+            handler.post( new Runnable ( ) {
+                @Override
+                public void run() {
+                    callback.onSuccess ( dbManager.getFromDb ( group_id ) );
+                }
+            } );
         } );
     }
 
@@ -48,8 +46,8 @@ public class InMemoryRepository implements NotesRepository {
     }
 
     @Override
-    public void addNote(Note note) {
-        dbManager.insertToDbNote ( note );
+    public Note addNote(Note note) {
+        return dbManager.insertToDbNote ( note );
     }
 
     @Override
@@ -92,7 +90,6 @@ public class InMemoryRepository implements NotesRepository {
         dbManager.closeDb();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
     @Override
     public List<Note> searchDb(String text) {
         return dbManager.searchDb ( text );
